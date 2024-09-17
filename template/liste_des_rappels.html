@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Liste des rappels {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Rappels</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Liste de rappels</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+       
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRappelModal">
+                            Nouveau rappel
+                        </button>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="example3" class="display" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>Prospect</th>
+                                        <th>Type rappel</th>
+                                        <th>Etat</th>
+                                        <th>Crée le</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    {% for e in list %}
+                                        <tr>
+                                            <td>{{e.prospect}}</td>
+                                            <td>{{e.get_type_rappel_display}}</td>
+                                            <td>
+                                                {% if e.etat == 'enc' %}
+                                                    <span class="badge light badge-success"><i class="fa fa-circle text-success me-1"></i>{{e.get_etat_display}}</span>
+                                                {% elif e.etat == 'fin' %}
+                                                    <span class="badge light badge-danger"><i class="fa fa-circle text-danger me-1"></i>{{e.get_etat_display}}</span>
+                                                {% elif e.etat == 'att' %}
+                                                    <span class="badge light badge-warning"><i class="fa fa-circle text-warning me-1"></i>{{e.get_etat_display}}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td><a href="javascript:void(0);"><strong>{{e.created_at}}</strong></a></td>
+                                            <td>
+                                                <div class="d-flex">
+                                                    <a href="{% url 'commercial:details-produit' pk=e.id %}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
+                                                    <a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+                                                </div>												
+                                            </td>												
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="addRappelModal" tabindex="-1" aria-labelledby="addRappelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRappelModalLabel">Crée un nouveau rappel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="addProductForm" action="{% url 'commercial:new_rappel' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description :</label>
+                        <input type="text" class="form-control" id="description" name="description" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="prospect" class="form-label">Prospect :</label>
+                        <select class="form-select" id="prospect" name="prospect">
+                          {% for e in prospect %}
+                            <option value="{{e.id}}">{{e.nom}} {{e.prenom}} </option>
+                          {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="date_rappel" class="form-label">Date de rappel :</label>
+                            <input type="date" class="form-control" id="date_rappel" name="date_rappel" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="heur_rappel" class="form-label">Heure du rappel :</label>
+                            <input type="time" class="form-control" id="heur_rappel" name="heur_rappel" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="priority" class="form-label">Priorité :</label>
+                            <select class="form-select" id="priority" name="priority">
+                                <option value="lo">Basse</option>
+                                <option value="me">Medium</option>
+                                <option value="he">Haute</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="type_rappel" class="form-label">Type rappel :</label>
+                            <select class="form-select" id="type_rappel" name="type_rappel">
+                                <option value="mes">Message</option>
+                                <option value="ema">Email</option>
+                                <option value="tel">Appel téléphonique</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" form="addProductForm" class="btn btn-primary">Ajouter le rappel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

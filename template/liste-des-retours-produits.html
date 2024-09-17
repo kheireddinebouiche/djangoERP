@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Retour des produits {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Produits</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Retour des produits</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-responsive-md" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                       
+                                        <th>Produit/Article</th>
+                                        <th>Référence</th>
+                                        <th>Qty. Retour</th>
+                                        <th>Crée le</th>
+                                        <th>Actions</th>
+                                    
+                                    </tr>
+                                </thead>
+                                <tbody id="tableListeItem">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+               
+                <div class="mt-4 text-center" id="deleteModalBody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+  $(document).ready(function(){
+
+    loadItem();
+
+    function loadItem(){
+        $.ajax({
+            url : "{% url 'commercial:ApiGetRetourProduitItem' %}",
+            type : "GET",
+            success : function(data){
+                var row = "";
+
+                if(data.length > 0){
+
+                    $.each(data, function(index, p){
+
+                        row += "<tr>";
+                        row += "<td>"+p.product__designation+"</td>";
+                        row += "<td>"+p.product__ref+"</td>";
+                        row += "<td>A</td>";
+                        row += "<td>"+p.created_at+"</td>";
+                        row += "<td>";
+                        row += "<button data-id='"+p.id+"' class='btn btn-primary shadow btn-xs sharp me-1' id='profileDetails'><i class='fas fa-pencil-alt'></i></button>";
+                        row += "<a href='#' class='btn btn-success shadow btn-xs sharp me-1' id='profileDetails'><i class='fas fa-eye'></i></a>";
+                        row += "<button data-id='"+p.id+"' id='confirmDeleteRecord' class='btn btn-danger shadow btn-xs sharp'><i class='fa fa-trash'></i></a>";
+                        row += "</td>";
+                        row += "</tr>";
+                    });
+
+                }else{
+                    row += "<tr><td colspan='5'><center><b>Aucun retour de produit pour le moment !</b></center></td></tr>";
+                }   
+                
+                $('#tableListeItem').html(row);
+            }
+        });
+    }
+
+    $(document).on('click', '#confirmDeleteRecord', function(){
+
+        var RetourLineId = $(this).data('id');
+        var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+        var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer la ligne</h4>" +
+            "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion de cette ligne, supprimera toutes les informations dans la base de données. </p>" +
+            "<div class = 'hstack gap-2 justify-content-center remove'>" +
+            "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+            "<button class ='btn btn-primary' data-id='"+RetourLineId+"' id='approveDelete'> Confirmer la suppréssion </button> </div>";
+
+        $('#deleteModalBody').html(lab+content);
+        $('#deleteRecordModal').modal('show');
+
+    });
+
+    $(document).on('click', '#approveDelete', function(){
+        var RetourLineId = $(this).data('id');
+
+        $.ajax({
+            url : "{% url 'commercial:DeleteRetourLine' %}",
+            type : 'GET',
+            data : {
+                'retour_line_id' : RetourLineId
+            },
+            success : function(response){
+                response.messages.forEach(function(message) {
+                    if (message.tags.includes('success')) {
+                        alertify.success(message.message);
+                    } else if (message.tags.includes('error')) {
+                        alertify.error(message.message);
+                    }
+                });
+                loadItem();
+                $('#deleteRecordModal').modal('hide');
+            }
+        });
+    });
+
+
+  });  
+    
+</script>
+
+{% endblock content %}
+
+
+
+

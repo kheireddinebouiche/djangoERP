@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block title %} Détails du produit {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+<div class="content-body">
+  <div class="container-fluid">
+<div class="row page-titles">
+<ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="javascript:void(0)">Gestion des produits</a></li>
+  <li class="breadcrumb-item  active"><a href="javascript:void(0)">Détails du produit - <i>{{obj.designation}}</i></a></li>
+</ol>
+      </div>
+      <div class="row">
+          <div class="col-lg-12">
+              <div class="card">
+                  <div class="card-body">
+                      <div class="row">
+                          <div class="col-xl-3 col-lg-6  col-md-6 col-xxl-5 ">
+                              <!-- Tab panes -->
+                              <div class="tab-content" id="myTabContent">
+                                  <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                                    <img class="img-fluid  " src="{{ obj.image.url }}" alt="">
+                                  </div>
+                              </div>
+                          </div>
+                          <!--Tab slider End-->
+                          <div class="col-xl-9 col-lg-6  col-md-6 col-xxl-7 col-sm-12">
+                              <div class="product-detail-content">
+                                  <!--Product details-->
+                                  <div class="new-arrival-content pr mt-md-0 mt-3">
+                                      <h4>{{obj.designation}}</h4>
+                                      
+                                      <div class="d-table mb-2">
+                                        <p class="price float-start d-block"></p>
+                                        <p class="product-para">Prix de vente : <span class="item"><p class="price float-start d-block">{{obj.prix_vente}} {{config.devise}}</p></span> </p>
+                                      </div>
+                                      <div class="d-table mb-2">
+                                        <p class="price float-start d-block"></p>
+                                        <p class="product-para">Prix d'achat : <span class="item"><p class="price float-start d-block">{{obj.prix_achat}} {{config.devise}}</p></span> </p>
+                                      </div>
+                                      <p class="product-para">Quantité en stock: <span class="item"> In stock <i
+                                                  class="fa fa-shopping-basket"></i></span>
+                                      </p>
+                                      <p class="product-para">Code barre : <span class="item">{{obj.code_barre}}</span> </p>
+                                      <p class="product-para">Catégorie : <span class="item">{{obj.categorie}}</span></p>
+                                      <p class="product-para">Réference : <span class="item">{{obj.ref}}</span></p>
+                                      
+                                      <p class="text-content">{% if obj.description %}{{obj.description}} {% else %} Aucune description !  {% endif %}</p>
+             
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="card-footer">
+                    <button type="button" id="updateBtn" data-id="{{obj.id}}" data-bs-toggle="modal" data-bs-target="#detailsDuProduit" class="btn btn-warning" >Modifier les informations</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="detailsDuProduit" tabindex="-1" aria-labelledby="detailsDuProduitLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+          <!-- Modal Header -->
+          <div class="modal-header">
+              <h5 class="modal-title" id="detailsDuProduitLabel">Modification des informations du produit</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <!-- Modal Body -->
+          <div class="modal-body">
+              <form method="POST">
+                  
+                  <div class="row">
+                      <div class="col-lg-6">
+                          <label for="new_label_product"><b>Désignation du produit</b></label>
+                          <input type="text" id="new_label_product" name="new_label_product" class="form-control" >
+                      </div>
+                      <div class="col-lg-6">
+                          <label for="new_email"><b>Email</b></label>
+                          <select id="category_select" class="form-control" name="category">
+                           
+                        </select>
+                      </div>
+                  </div>        
+                  
+              </form>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+              <button type="submit" class="btn btn-warning" id="updateProductInfos">Modifier les informations</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function(){
+
+    $(document).on('click', '#updateBtn', function(){
+      var id_product = $(this).data('id');
+      $.ajax({
+        url : "{% url 'commercial:ApiFetchProductDetails' %}",
+        data : {
+          'id_product' : id_product,
+        },
+        type: 'GET',
+        success : function(data){
+          var i = data.product;
+          var c = data.categories;
+
+          $('#new_label_product').val(i.designation);
+
+           // Vider le champ select avant de le remplir
+          var $categorySelect = $('#category_select');
+              $categorySelect.empty();
+
+              // Remplir le champ select avec les catégories disponibles
+              $.each(c, function(index, category) {
+                  var selected = i.categorie === category.id ? 'selected' : '';
+                  $categorySelect.append('<option value="' + category.id + '" ' + selected + '>' + category.label + '</option>');
+              });
+        },
+      });
+    }); 
+    
+    $(document).on('click', '#updateProductInfos', function(){
+      var new_designation = document.getElementById('new_label_product').value;
+
+     
+     
+    });
+    
+  });
+</script>
+
+{% endblock content %}

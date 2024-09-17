@@ -1,0 +1,94 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FACTURE {{conf.prefix_facture}}-{{ invoice.number }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
+        #ligne_art { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1px; }
+        th, td { padding: 4px; border: 1px solid #000; text-align: left; }
+        #tr_ling td { text-align: left; margin-top: 4px; margin-left: -17px; }
+        .header-table { width: 100%; margin-top: 30px; }
+        .header-table td { border: none; padding: 10px; vertical-align: top; }
+        
+    </style>
+</head>
+<body>
+    <img src="{{ conf.logo.url }}" alt="Logo" width="150px"/>
+
+
+    <h2>{{conf.prefix_facture}}-{{invoice.number}}</h2>
+
+    {% if invoice.devis.number %}
+    <p><b>Réf. Commande :</b> {{ invoice.devis.number }}</br>
+    {% endif %}
+    <b>Date facture :</b> {{ invoice.date_facturation }}</p>
+    
+    <table class="header-table">
+        <tr>
+            <td>
+                <p><b style="font-size: 13px; font-weight: 700;">Client</b><br> 
+                {{ invoice.client }}<br>
+                {{invoice.client.adresse}}<br>
+                N° NIF : {{invoice.client.nif}}<br>
+                N° ART : {{invoice.client.art}}</p>
+            </td>
+            <td>
+               
+                
+
+                <p><b style="font-size: 13px; font-weight: 700;">Fournisseur</b><br>
+                {{ invoice.client }}<br>
+                {{ invoice.client }}</p>
+            </td>
+        </tr>
+    </table>
+
+    <table id="ligne_art">
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Réf.</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr id="tr_ling">
+                <td>{{ item.produit }}</td>
+                <td>{{ item.produit.ref }}</td>
+                <td>{{ item.qty }}</td>
+                <td style="font-weight: 700;">{{ item.produit.prix_vente }} {{conf.devise}}</td>
+                <td style="font-weight: 700;">{{ item.ht }} {{conf.devise}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table>
+        <tr>
+            <td style="width: 450px; border: 0;"></td>
+            <td>Montant HT</td>
+            <td><b>{{montant_ht|floatformat:2}} {{conf.devise}}</b></td>
+        </tr>
+        <tr>
+            <td style="width: 450px; border: 0;"></td>
+            <td>Montant TVA</td>
+            <td><b>{{montant_tva|floatformat:2}} {{conf.devise}}</b></td>
+        </tr>
+        <tr>
+            <td style="width: 450px; border: 0;"></td>
+            <td>Montant TTC</td>
+            <td><b>{{montant_ttc|floatformat:2}} {{conf.devise}}</b></td>
+        </tr>
+    </table>
+    <p><b style="font-size: 12px;">Arréter la présente facture a : </b><br>
+    <i><span style="font-size: 12px; margin-left: 100px;">{{chiffreEnLettre}} Dinars Algerien</span></i></p>
+
+
+</body>
+</html>

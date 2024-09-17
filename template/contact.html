@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Contact Form</h1>
+    <form id="contactForm" method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+    <div id="message"></div>
+    <script>
+        $(document).ready(function(){
+            $('#contactForm').on('submit', function(event){
+                event.preventDefault();
+                $.ajax({
+                    url: "{% url 'commercial:contact' %}",
+                    method: "POST",
+                    data: $(this).serialize(),
+                    success: function(response){
+                        $('#message').html('<p>' + response.message + '</p>');
+                    },
+                    error: function(response){
+                        $('#message').html('<p>Error: ' + response.responseJSON.errors + '</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

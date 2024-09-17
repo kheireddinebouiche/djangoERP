@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %} Modification des informations du produit {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% load static %}
+{% block content %}
+
+<div class="content-body">
+    <div class="container-fluid">
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Gestion des produits</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Modification des informations du produit</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+        <div class="row">
+            
+            <div class="col-xl-12 col-lg-12">
+                <div class="card">
+                    
+                    <div class="card-body">
+                        <div class="basic-form">
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <label for="{{ form.designation.id_for_label }}">{{ form.designation.label }}</label>
+                                        {{ form.designation }}
+                                        {{ form.designation.errors }}   
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="{{ form.categorie.id_for_label }}">{{ form.categorie.label }}</label>
+                                        {{ form.categorie }}
+                                        {{ form.categorie.errors }}   
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.ref.id_for_ref }}">{{ form.ref.label }}</label>
+                                        {{ form.ref }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.code_barre.id_for_codebarre }}">{{ form.code_barre.label }}</label>
+                                        {{ form.code_barre }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-3">  
+                                    <div class="col-md-4">
+                                        <label for="{{ form.prix_vente.id_for_vente }}">{{ form.prix_vente.label }}</label>
+                                        {{ form.prix_vente }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="{{ form.prix_achat.id_for_achat }}">{{ form.prix_achat.label }}</label>
+                                        {{ form.prix_achat }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="{{ form.cout_produit.id_for_cout_produit }}">{{ form.cout_produit.label }}</label>
+                                        {{ form.cout_produit }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12  mt-3">
+                                    <label for="{{ form.stock_alert.id_for_image }}">{{ form.stock_alert.label }}</label>
+                                    {{ form.stock_alert }}
+                                </div>
+                                <div class="col-md-12  mt-3">
+                                    <label for="{{ form.image.id_for_image }}">{{ form.image.label }}</label>
+                                    {{ form.image }}
+                                </div>
+                                
+                                
+                                <button type="submit" class="btn btn-primary mt-3">Confirmer les informations</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

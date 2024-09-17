@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Création d'un devis {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <!-- <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Notes</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Liste de mes notes</a></li>
+            </ol>
+        </div> -->
+        <!-- row -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <label for="id_caisse">N° Devis</label>
+                                <input hidden readonly ="text" class="form-control" id="id_caisse" value="{{obj.number}}">
+                                <input hidden readonly ="text" class="form-control" id="id_devis" value="{{obj.id}}">
+                                <p><b>{{conf.prefix_devis}}-{{obj.number}}</b></p>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="date_caisse">Date</label>
+                                <input hidden readonly ="text" class="form-control" id="date_caisse" value="{{obj.date_devis}}">
+                                <p><b>{{obj.date_devis}}</b></p>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="devis_user">Utilisateur</label>
+                                <input hidden readonly ="text" class="form-control" id="devis_user" value="{{obj.user}}">
+                                <p><b>{{obj.user}}</b></p>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="devis_mode_paiement">Mode de paiement</label>
+                                <input hidden readonly type="text" class="form-control" name="devis_mode_paiement" id="devis_mode_paiement" value="{{obj.get_mode_paiement_display}}">
+                                <p><b>{{obj.get_mode_paiement_display}}</b></p>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-lg-3">
+                                <label for="devis_exipration_date">Valide jusqu'au :</label>
+                                <input hidden readonly ="text" class="form-control" id="devis_exipration_date" value="{{obj.date_expiration}}">
+                                <p><b>{{obj.date_expiration}}</b></p>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="devis_client">Client</label>
+                                <input hidden readonly ="text" class="form-control" id="devis_client" value="{{obj.client}}">
+                                <p><b>{{obj.client}}</b></p>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="etat">Etat </label>
+                                <input hidden readonly ="text" class="form-control" id="etat" value="{{obj.get_etat_display}}">
+                                <p><b>{{obj.get_etat_display}}</b></p>
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="devis_delais_paiement">Délai paiement</label>
+                                <input hidden readonly type="text" class="form-control" name="devis_delais_paiement" id="devis_delais_paiement" value="{{obj.get_delai_paiement_display}}">
+                                <p><b>{{obj.get_delai_paiement_display}}</b></p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="row mt-3">
+                                <div class="col-lg-12">
+                                    {% if obj.etat == "bro" %}
+                                        <a href="{% url 'commercial:validateDevis' pk=obj.id %}" class="btn btn-primary"> Valider </a>
+                                        <a href="" class="btn btn-success"> Modifier </a>
+                                    {% endif %}
+                                    {% if obj.etat == "fac" %}
+                                        <a href="{% url 'commercial:makeDevisBrouillon' pk=obj.id %}" class="btn btn-primary"> Brouillon </a>
+                                        <a href="{% url 'commercial:GenFactureFromDevis' pk=obj.id %}" class="btn btn-warning"> Generer une facture </a>
+                                    {% endif %}
+                                    <a href="" class="btn btn-danger"> Supprimer </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">     
+            <div class="col-8">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AjoutProduitAuDevis">
+                           Ajouter produit
+                          </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="lignesCaisseTable" class="table table-responsive-md" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>Produit/Article</th>
+                                        <th>Prix U </th>
+                                        <th>Qty</th>
+                                        <th>TVA</th>
+                                        <th>Total TTC</th>
+                                        <th>Actions</th>  
+                                    </tr>
+                                </thead>
+                                <tbody id="devisItemLigne">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">   
+                    <div class="card-body">
+                        <div class="row">
+                            <label for="montant_ht">Montant HT :</label>
+                            <input readonly  type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_ht" >
+                        </div>
+
+                        <div class="row">
+                            <label for="montant_tva">Montant TVA :</label>
+                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_tva">
+                        </div>
+
+                        <div class="row">
+                            <label for="montant_ttc">Montant TTC :</label>
+                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_ttc">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="AjoutProduitAuDevis" tabindex="-1" aria-labelledby="AjoutProduitAuDevisLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="AjoutProduitAuDevisLabel">Formulaire de création d'un utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form method="POST">
+                    
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <label for="product"><b>Produit</b></label>
+                            <select class="form-control" id="product" name="product">
+                                {% for pr in products %}
+                                    <option value="{{pr.id}}">{{pr.designation}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="qty"><b>Quantité </b></label>
+                            <input type="number" id="qty" name="qty" class="form-control" require step="1">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="tva"><b>TVA </b></label>
+                            <select class="form-control" id="tva" name="tva">
+                                {% for e in tva %}
+                                    <option value="{{e.id}}">{{e.taux}} %</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>   
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="addNewProduct">Ajouter le produit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function(){
+
+        var id_devis = document.getElementById('id_devis').value;
+        
+        $('#montant_ht').val('{{montant_ht|floatformat:2}}'+' '+'{{conf.devise}}');
+        $('#montant_ttc').val('{{montant_ttc|floatformat:2}}'+' '+'{{conf.devise}}');
+        $('#montant_tva').val('{{montant_tva|floatformat:2}}'+' '+'{{conf.devise}}');
+
+       
+
+        loadDevisItem()
+
+        $(document).on('click', '#addNewProduct', function(){
+            var produit = document.getElementById('product').value;
+            var qty = document.getElementById('qty').value;
+            var taux = document.getElementById('tva').value;
+
+            $.ajax({
+                url : "{% url 'commercial:addNewDevisProduct' %}",
+                type : "POST",
+                data : {
+                    'id_devis' : id_devis,
+                    'produit' : produit,
+                    'qty' : qty,
+                    'taux' : taux,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    alertify.set('notifier', 'position', 'top-right');
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    
+                    loadDevisItem();
+                    $('#montant_ht').val(parseFloat(response.montant_ht).toFixed(2)+' '+'{{conf.devise}}');
+                    $('#montant_ttc').val(parseFloat(response.montant_ttc).toFixed(2)+' '+'{{conf.devise}}');
+                    $('#montant_tva').val(parseFloat(response.montant_tva).toFixed(2)+' '+'{{conf.devise}}');
+                    $('#AjoutProduitAuDevis').modal('hide');
+                }
+            });
+        });
+
+    
+        function loadDevisItem(){
+            $.ajax({
+                url : "{% url 'commercial:ApiFecthDevisLigne' %}",
+                type : "GET",
+                data : {
+                    'id_devis' : id_devis
+                },
+                success : function(data){
+                    if (data.length > 0){
+                        var devisBody = $('#devisItemLigne');
+                        devisBody.empty();
+
+                        $.each(data, function(index, p){
+
+                            var row = "<tr>";
+                                row +="<td>"+p.produit__designation+"</td>";
+                                row +="<td>"+p.produit__prix_vente+" {{conf.devise}}</td>";
+                                row +="<td>"+p.qty+"</td>";
+                                row +="<td>"+p.tva+" %</td>";
+                                row +="<td><b>"+p.ttc+" {{conf.devise}}</b></td>";
+                                row += "<td><button class='btn btn-danger shadow btn-xs sharp me-1' id='deleteBtn' data-id='"+ p.id +"' '><i class='fa fa-trash'></i></button></td>";
+                                row +="</tr>";
+                                devisBody.append(row);
+                        });
+                        
+                        
+                    }else{
+                        var row = "<tr><td colspan='6'><center><b>Veuillez ajouter des produits/Articles</b></center></td></tr>"; 
+                    }
+                    $('#devisItemLigne').html(row);
+                }
+            });
+        }
+
+        $(document).on('click','#deleteBtn', function(){
+            var id_ligne = $(this).data('id');
+            
+            $.ajax({
+                url : "{% url 'commercial:deleteLigneDevis' %}",
+                type : 'GET',
+                data : {
+                    'id_ligne' : id_ligne,
+                    'id_devis' : id_devis,
+                },
+                success : function(response){
+                    alertify.set('notifier', 'position', 'top-right');
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    
+                    loadDevisItem();
+                    $('#montant_ht').val(parseFloat(response.montant_ht).toFixed(2)+' '+'{{conf.devise}}');
+                    $('#montant_ttc').val(parseFloat(response.montant_ttc).toFixed(2)+' '+'{{conf.devise}}');
+                    $('#montant_tva').val(parseFloat(response.montant_tva).toFixed(2)+' '+'{{conf.devise}}');
+                }
+            });
+        });
+    });
+</script>
+
+
+{% endblock content %}

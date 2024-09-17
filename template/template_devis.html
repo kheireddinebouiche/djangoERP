@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DEVIS {{conf.prefix_devis}}-{{ quot.number }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
+        #ligne_art{ width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table{ width: 100%; border-collapse: collapse; margin-top: 1px; }
+        th, td { padding: 4px; border: 1px solid #000; text-align: center; }
+        #tr_ling td {text-align: left;margin-top: 4px; margin-left: -17px;}
+        .header { text-align: center; margin-top: 30px; }
+       
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1> {{conf.prefix_facture}}-{{ quot.number }}</h1>
+        <p>Date: {{ quot.date_facturation }}</p>
+        <p>Client: {{ quot.client }}</p>
+    </div>
+
+    <table id="ligne_art">
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th>Réf.</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr id="tr_ling">
+                <td>{{ item.produit }}</td>
+                <td>{{ item.produit.ref }}</td>
+                <td>{{ item.qty }}</td>
+                <td style="font-weight: 700;">{{ item.produit.prix_vente }} {{conf.devise}}</td>
+                <td style="font-weight: 700;">{{ item.ht }} {{conf.devise}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table>
+        <tr>
+            <td style="width: 450px;border: 0;"></td>
+            <td>Montant HT</td>
+            <td><b>{{montant_ht|floatformat:2}} {{conf.devise}}</b></td>
+        
+        </tr>
+        <tr>
+            <td style="width: 450px; border: 0;"></td>
+            <td>Montant TVA</td>
+            <td><b>{{montant_tva|floatformat:2}} {{conf.devise}}</b></td>
+        
+        </tr>
+        <tr>
+            <td style="width: 450px;border: 0;"></td>
+            <td>Montant TTC</td>
+            <td><b>{{montant_ttc|floatformat:2}} {{conf.devise}}</b></td>
+        </tr>
+    </table>
+
+    
+</body>
+</html>

@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% block title %} Liste des paiements des clients {% endblock title %}
+
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+
+{% block content %}
+
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Ventes</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Liste des paiements clients</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nouveauPaiement">
+                            Nouveau paiement
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-responsive-md" style="min-width: 845px">
+                                <thead>
+                                    <tr>
+                                        <th>N° facture</th>
+                                        <th>Montant payé</th>
+                                        <th>Date de paiement</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="PaimentsListeTableBody">
+
+                                  
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="nouveauPaiement" tabindex="-1" aria-labelledby="nouveauPaiementLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="nouveauPaiementLabel">Nouveau paiement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label for="facture">N° Facture</label>
+                        <select name="facutre" id="facture" class="form-control" required>
+                            <option value="none">------------------</option>
+                            {% for f in factures %}
+                                <option value="{{f.id}}">{{conf.prefix_facture}} {{f.number}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-lg-12">
+                        <label for="date_paiement">Date paiement</label>
+                        <input type="date" class="form-control" name="date_paiement" id="date_paiement" required>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-lg-6">
+                        <label for="montant_paye">Montant payé</label>
+                        <input type="number" class="form-control" name="montant_paye" id="montant_paye" step="0.01" required>
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="reference_paiement">Référence paiement</label>
+                        <input type="text" class="form-control" name="reference_paiement" id="reference_paiement" >
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    
+                </div>
+                
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="addNewPaiement">Confirmer le paiement</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="detailsPaiement" tabindex="-1" aria-labelledby="detailsPaiementLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsPaiementLabel">Nouveau paiement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label for="facture">N° Facture</label>
+                        <select name="facutre" id="facture" class="form-control" required>
+                            <option value="none">------------------</option>
+                            {% for f in facture %}
+                                <option value="{{f.id}}">{{f.number}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-lg-12">
+                        <label for="date_paiement">Date paiement</label>
+                        <input type="date" class="form-control" name="date_paiement" id="date_paiement" required>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-lg-6">
+                        <label for="montant_paye">Montant payé</label>
+                        <input type="number" class="form-control" name="montant_paye" id="montant_paye" step="0.01" required>
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="reference_paiement">Référence paiement</label>
+                        <input type="text" class="form-control" name="reference_paiement" id="reference_paiement" >
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    
+                </div>
+                
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="addNewPaiement">Confirmer le paiement</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+               
+                <div class="mt-4 text-center" id="deleteModalBody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+
+        loadPaiementListe();
+
+        function loadPaiementListe(){
+
+            $.ajax({
+                url : '{% url "commercial:ApiFetchListePaiement" %}',
+                type : 'GET',
+                success : function(data){
+                    var row = "";
+                    
+                    if(data.length == 0){
+
+                        row = "<tr><td colspan='5'><b><center>Aucun paiement effectué pour le moment<b></center></td></tr>";    
+                        $('#PaimentsListeTableBody').html(row);
+
+                    }else{
+                        
+                        $.each(data, function(index,p){
+                        
+                            row += "<tr>";
+                            row += "<td><b>{{conf.prefix_facture}} " + p.facture__number + " </b></td>";
+                            row += "<td><b>" + p.montant_paiement + " {{conf.devise}}</b></td>";
+                            row += "<td><b>" + p.date_paiement + "</b></td>";
+                            row += "<td>";
+                            row += "<button data-id='"+p.facture+"' class='btn btn-primary shadow btn-xs sharp'><i class='fa fa-eye'></i></button>"; 
+                            row += "</td>";
+                            row += "</tr>";
+                        });
+                        
+                        $('#PaimentsListeTableBody').html(row);
+                    }       
+                }
+            });
+        }
+
+        $(document).on('click','#detailsPaiementBtn', function(){
+
+        });
+
+        $(document).on('click', '#addNewPaiement', function(){
+            var id_facture = document.getElementById('facture').value;
+            var date_paiement = document.getElementById('date_paiement').value;
+            var montant_paiement = document.getElementById('montant_paye').value;
+            var ref_paiement = document.getElementById('reference_paiement').value;
+
+            $.ajax({
+                url : '{% url "commercial:AddPaiement" %}',
+                data : {
+                    'id_facture' : id_facture,
+                    'date_paiement' : date_paiement,
+                    'montant_paiement' : montant_paiement,
+                    'ref_paiement' : ref_paiement,
+                    
+                },
+                type : 'GET',
+                success: function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadPaiementListe();
+                    $('#nouveauPaiement').modal('hide');
+                }
+                  
+            });
+        });
+    });
+</script>
+
+{% endblock content %}

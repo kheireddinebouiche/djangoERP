@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Liste des produits {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Produits</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Liste des produits</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <a href="{% url 'commercial:nouveau-produit' %}" class="btn btn-primary"> Ajout rapide de produit </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="example3" class="display" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                       
+                                        <th>Designation</th>
+                                        <th>Référence</th>
+                                        <th>Prix de vente</th>
+                                        <th>Prix d'achat</th>
+                                        <th>Crée le</th>
+                                        <th>Actions</th>
+                                    
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    {% for e in list %}
+                                        <tr>
+                                            
+                                            <td>{{e.designation}}</td>
+                                            <td>{{e.ref}}</td>
+                                            <td>{{e.prix_vente}} {{config.devise}}</td>
+                                            <td>{{e.prix_achat}} {{config.devise}}</td>
+                                            <td><a href="javascript:void(0);"><strong>{{e.created_at}}</strong></a></td>
+                                            <td>
+                                                <div class="d-flex">
+                                                    <a href="{% url 'commercial:update_produit' pk=e.id %}" class="btn btn-warning shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
+                                                    <a href="{% url 'commercial:details-produit' pk=e.id %}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-eye"></i></a>
+                                                    
+                                                    <a href="{% url 'commercial:delete_product' pk=e.id %}" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+                                                </div>												
+                                            </td>												
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        {% include 'modals/add-product.html' %}
+
+    </div>
+</div>
+
+{% endblock content %}
+
+
+
+

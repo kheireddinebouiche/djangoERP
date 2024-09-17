@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Liste des utlisateurs {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Gestion des utilisateurs</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Liste des utilisateurs</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#creationDunUtilisateur">
+                           Nouveau utilisateur
+                          </button>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-responsive-md" style="min-width: 845px">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Username</th>
+                                        <th>Nom</th>
+                                        <th>Prénom</th>
+                                        <th>Rôle</th>
+                                        <th>Etat du compte</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="profileTableListe">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- The Modal -->
+<div class="modal fade" id="shooProfileData" tabindex="-1" aria-labelledby="shooProfileDataLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="shooProfileDataLabel">Modifier les informations de l'utilisatur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="profileDetailsForm" action="#" method="POST">
+                    
+                    
+                    
+                    
+                    
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer" id="footer_update_user">
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="creationDunUtilisateur" tabindex="-1" aria-labelledby="creationDunUtilisateurLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="creationDunUtilisateurLabel">Formulaire de création d'un utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form method="POST">
+                    
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label for="new_username_add"><b>Nom d'utilisateur</b></label>
+                            <input type="text" id="new_username_add" name="new_username_add" class="form-control" placeholder="Nom d'utilisateur">
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="new_email"><b>Email</b></label>
+                            <input type="text" id="new_email" name="new_email" class="form-control" placeholder="Email">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="new_mot_passe"><b>Mot de passe</b></label>
+                            <input type="password" id="new_mot_passe" name="new_mot_passe" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-6">
+                            <label for="new_nom"><b>Nom </b></label>
+                            <input type="text" id="new_nom" name="new_nom" class="form-control" placeholder="Nom">
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="new_prenom"><b>Prénom</b></label>
+                            <input type="text" id="new_prenom" name="new_prenom" class="form-control" placeholder="Prénom">
+                        </div>
+                    </div>
+            
+                    
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="addNewUser">Créer l'utilisateur</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+               
+                <div class="mt-4 text-center" id="deleteModalBody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        
+        $(document).on('click','#profileDetails', function(){
+            var id_profile = $(this).data('id');
+
+            $.ajax({
+                url : "{% url 'commercial:GetProfileInfo' %}",
+                type : 'GET',
+                data : {'id_profile' : id_profile},
+
+                success: function(response){
+                    
+                    var content = '{% csrf_token %}'+
+                                  '<div class="mb-3">'+
+                                        '<label for="username" class="form-label">Nom d\'utilisateur </label>'+
+                                        '<input type="text" class="form-control" id="username" name="username" value="'+response[0].user__username+'" required>'+
+                                  '</div>'+
+                                  '<div class="row">'+
+                                    '<div class="col-lg-6 mb-3">'+
+                                            '<label for="nom" class="form-label"> Nom</label>'+
+                                            '<input type="text" class="form-control" id="nom" name="nom" value="'+response[0].nom+'" required>'+
+                                    '</div>'+
+                                    '<div class="col-lg-6 mb-3">'+
+                                            '<label for="prenom" class="form-label"> Prénom </label>'+
+                                            '<input type="text" class="form-control" id="prenom" name="prenom" value="'+response[0].prenom+'" required>'+
+                                    '</div>'+
+                                  '</div>'+
+                                  '<div class="col-lg-6 mb-3">'+
+                                            '<label for="email" class="form-label"> Email </label>'+
+                                            '<input type="text" class="form-control" id="email" name="email" value="'+response[0].user__email+'" required>'+
+                                    '</div>';
+
+                        var foot = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>'+
+                                    '<button type="submit" class="btn btn-warning" id="updateBtn" data-id="'+response[0].id+'">Confirmer les modifications</button>';
+
+
+                    $('#profileDetailsForm').html(content);
+                    $('#footer_update_user').html(foot);
+                    $('#shooProfileData').modal('show');
+                }
+            });
+        });
+        
+        $(document).on('click', '#updateBtn', function(){
+            var id_profile = $(this).data('id');
+            var new_nom = document.getElementById('nom').value;
+            var new_prenom = document.getElementById('prenom').value;
+
+            $.ajax({
+                url : "{% url 'commercial:updateProfile' %}",
+                type : "POST",
+                data : {
+                    'id' : id_profile,
+                    'nom' : new_nom,
+                    'prenom' : new_prenom,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+
+                success : function(response){
+                    
+                    // Déclencher les notifications alertify pour chaque message
+                    alertify.set('notifier', 'position', 'top-right');
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+
+                    loadProfiledata();
+                    $('#shooProfileData').modal('hide');
+                
+
+                    
+                }
+            });
+
+            
+        });
+    
+        loadProfiledata();
+
+        function loadProfiledata(){
+
+            $.ajax({
+                url : "{% url 'commercial:ListeDeUtilisateursPage' %}",
+                type : 'GET',
+                success : function(data){
+                    var row = "";
+                    $.each(data, function(index,p){
+                        
+                        row += "<tr>";
+                        row += "<td><b>" + + "</b></td>";
+                        row += "<td><b>" + p.user__username + "</b></td>";
+                        row += "<td><b>" + p.nom + "</b></td>";
+                        row += "<td><b>" + p.prenom + "</b></td>";
+                       
+                        row += "<td><b>" + p.type_profile_label + "</b></td>";
+                        row += "<td><b>" + (p.user__is_active ? "Activer"  : "Désactiver" ) + "</b></td>";
+                        row += "<td><div class='d-flex'>";
+                        row += "<button data-id='"+p.id+"' class='btn btn-primary shadow btn-xs sharp me-1' id='profileDetails'><i class='fas fa-pencil-alt'></i></button>";
+                        row += "<a href='/gestion-des-utilisateurs/details-utilisateurs/"+p.user__id+"' class='btn btn-success shadow btn-xs sharp me-1' id='profileDetails'><i class='fas fa-eye'></i></a>";
+                        row += "<button data-id='"+p.user__id+"' id='confirmuserDeleteBtn' class='btn btn-danger shadow btn-xs sharp'><i class='fa fa-trash'></i></a>";
+                        row += "</div>";											
+                        row += "</td>";
+                        row += "</tr>";
+                    });
+
+                    $('#profileTableListe').html(row);
+
+                }
+            });
+
+        }
+        
+        $(document).on('click', '#addNewUser', function(){
+
+            var new_nom = document.getElementById('new_nom').value;
+            var new_prenom = document.getElementById('new_prenom').value;
+            var new_username = document.getElementById('new_username_add').value;
+            var new_email = document.getElementById('new_email').value;
+            var new_mot_passe = document.getElementById('new_mot_passe').value;
+
+            $.ajax({
+                url : "{% url 'commercial:addNewUserProfile' %}",
+                type : "POST",
+                data : {
+                    'new_nom' : new_nom,
+                    'new_prenom' : new_prenom,
+                    'new_username' : new_username,
+                    'new_email' : new_email,
+                    'new_mot_passe' : new_mot_passe,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+
+                success: function(response){
+                    
+                        // Déclencher les notifications alertify pour chaque message
+                        alertify.set('notifier', 'position', 'top-right');
+                        response.messages.forEach(function(message) {
+                            if (message.tags.includes('success')) {
+                                alertify.success(message.message);
+                            } else if (message.tags.includes('error')) {
+                                alertify.error(message.message);
+                            }
+                        });
+                        loadProfiledata();
+                        $('#creationDunUtilisateur').modal('hide');
+                    
+                }   
+            });
+        });
+        
+        $(document).on('click', '#confirmuserDeleteBtn', function(){
+            var user_id = $(this).data('id');
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer un utilisateur</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion de l'utilisateur supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+user_id+"' id='userDeleteBtn'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+            $('#deleteRecordModal').modal('show');
+        })
+
+        $(document).on('click', '#userDeleteBtn', function(){
+            var user_id = $(this).data('id');
+
+            $.ajax({
+                url :'{% url "commercial:deleteUser" %}',
+                type : 'GET',
+                data : {
+                    'id' : user_id,
+                },
+                success : function(response){
+                    // Déclencher les notifications alertify pour chaque message
+                    alertify.set('notifier', 'position', 'top-right');
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+
+                    loadProfiledata();
+                    $('#deleteRecordModal').modal('hide');
+                }
+            });
+        }); 
+    });
+
+</script>
+
+{% endblock content %}

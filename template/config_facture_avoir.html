@@ -1,0 +1,577 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Configuration de la facture d'avoir {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+<style>
+    .btn{
+        padding: 5px 5px 5px 5px; 
+        font-size: 14px;
+        width: 140px;
+        font-weight: 700;
+    }
+</style>
+
+<div class="content-body">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+
+                            <div class="col-lg-4">
+                                <label for="id_facture_avoir">N° Facture d'avoir</label>
+                                <input hidden readonly ="text" class="form-control" id="number_facture" value="{{obj.number}}">
+                                <input hidden readonly ="text" class="form-control" id="id_facture_avoir" value="{{obj.id}}">
+                                <p><b>{{conf.prefix_avoir}}-{{obj.number}}</b></p>
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="date_facturation">Date de création</label>
+                                <input hidden readonly ="text" class="form-control" id="date_facturation" value="{{obj.date_facturation}}">
+                                <p><b>{{obj.created_at|date}}</b></p>
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="devis_user">Utilisateur</label>
+                                <input hidden readonly ="text" class="form-control" id="devis_user" value="{{obj.user}}">
+                                <p><b>{{obj.user}}</b></p>
+                            </div>
+                            
+                        </div>
+
+                        <div class="row mt-2">
+                            {% if obj.ref_facture %}
+                            <div class="col-lg-4">
+                                <label for="ref_devis">Réf. facture</label>
+                                <p><b>{{conf.prefix_facture}}-{{obj.ref_facture}}</b></p>
+                            </div>
+                            {% endif %}
+                            <div class="col-lg-4">
+                                <label for="devis_client">Client</label>
+                                <p><b>{{obj.ref_facture.client}}</b></p>
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="etat">Etat </label>
+                                <input hidden readonly ="text" class="form-control" id="etat" value="{{obj.get_etat_display}}">
+                                <p><b>{{obj.get_etat_display}}</b></p>
+                            </div>
+                            
+                        </div>
+
+                        <div class="row">
+                            <div class="row mt-3">
+                                <div class="col-lg-12">
+                                    {% if obj.etat == "bro" %}
+                                        <button data-id="{{obj.id}}" id="validateBtn" class="btn btn-primary"> Valider </button>
+                                        <button data-id="{{obj.id}}" type="button" id="updateFactureBtn" class="btn btn-success"> Modifier </button>
+                                    {% endif %}
+                                    {% if obj.etat == "fac" %}
+                                        <a href="{% url 'commercial:makeDevisBrouillon' pk=obj.id %}" class="btn btn-primary"> Brouillon </a>
+                                    {% endif %}
+                                    {% if request.user.is_staff %}
+                                        <a href="" class="btn btn-danger"> Supprimer </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-body">
+                        <label for="motif">Motifs de la facture</label>
+                        <textarea name="motif" id="motif" class="form-control" readonly>{{obj.motifs}}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">     
+            <div class="col-8">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AjoutProduitAuDevis">
+                           + Produit
+                          </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="lignesCaisseTable" class="table table-responsive-md" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>Produit/Article</th>
+                                        <th>Prix U </th>
+                                        <th>Qty</th>
+                                        <th>TVA</th>
+                                        <th>Total TTC</th>
+                                        <th>Actions</th>  
+                                    </tr>
+                                </thead>
+                                <tbody id="factureItemLigne">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">   
+                    <div class="card-body">
+                        <div class="row">
+                            <label for="montant_ht">Montant HT :</label>
+                            <input readonly  type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_ht" >
+                        </div>
+
+                        <div class="row">
+                            <label for="montant_tva">Montant TVA :</label>
+                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_tva">
+                        </div>
+
+                        <div class="row">
+                            <label for="montant_ttc">Montant TTC :</label>
+                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_ttc">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="AjoutProduitAuDevis" tabindex="-1" aria-labelledby="AjoutProduitAuDevisLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="AjoutProduitAuDevisLabel">Formulaire de création d'un utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form method="POST">
+                    
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <label for="product"><b>Produit</b></label>
+                            <select class="form-control" id="product" name="product">
+                                {% for pr in products %}
+                                    <option value="{{pr.id}}">{{pr.designation}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="qty"><b>Quantité </b></label>
+                            <input type="number" id="qty" name="qty" class="form-control" require step="1">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="tva"><b>TVA </b></label>
+                            <select class="form-control" id="tva" name="tva">
+                                {% for e in tva %}
+                                    <option value="{{e.id}}">{{e.taux}} %</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>   
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="addNewProduct">Ajouter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="EditLigneAvoirModal" tabindex="-1" aria-labelledby="EditLigneAvoirModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="AjoutProduitAuDevisLabel">Modification de la facture d'avoir</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form method="POST">
+                    
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <label for="product"><b>Produit</b></label>
+                            <input disabled type="text" name="ligne_avoir_pr" id="ligne_avoir_pr" class="form-control" />
+                            <input hidden readonly type="text" name="id_ligne_avoir" id="id_ligne_avoir" class="form-control" />
+                        </div>
+                    </div>  
+                    <div class="row mt-3">
+                        <div class="col-lg-6">
+                            <label for="ligne_avoir_qty"><b>Quantité original</b></label>
+                            <input disabled type="text" name="ligne_avoir_qty" id="ligne_avoir_qty" class="form-control" />
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="qty_retour"><b>Quantité à retourné</b></label> 
+                            <input type="number" name="qty_retour" id="qty_retour" class="form-control" required />
+                        </div>
+                    </div> 
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="if_reintegre"><b>Réintégration dans le stock</b></label>
+                            <select class="form-control" name="if_reintegre" id="if_reintegre">
+                                <option value="oui">Oui</option>
+                                <option value="non" selected >Non</option>
+                            </select>
+                        </div>
+                    </div> 
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="motif_retour"><b>Motifs</b></label>
+                            <input type="text" name="motif_retour" id="motif_retour" class="form-control" required />
+                        </div>
+                    </div> 
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="confirmUpdLigneAvoir">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="updateFactureDetails" tabindex="-1" aria-labelledby="updateFactureDetailsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateFactureDetailsLabel">Modification des informations de la facture</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form method="POST">
+                    
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <label for="client"><b>Client</b></label>
+                            <select class="form-control" name="new_client" id="new_client">
+                                {% for c in clients %}
+                                    <option value="{{c.id}}" {% if obj.client.id == c.id %} selected {% endif %}>{{c.designation}} </option>
+                                {% endfor %} 
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="new_date_facturation"><b>Date de facturation</b></label>
+                            <input type="date" class="form-control" id="new_date_facturation" name="new_date_facturation" value="{{ obj.date_facturation|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-6">
+                            <label for="new_mode_paiement"><b>Mode de paiement </b></label>
+                            <select class="form-control" name="new_mode_paiement" id="new_mode_paiement">
+                                <option {% if obj.mode_paiement == "chq" %} selected {% endif %} value="chq">Chéque</option>
+                                <option {% if obj.mode_paiement == "vir" %} selected {% endif %} value="vir">Virement Bancaire</option>
+                                <option {% if obj.mode_paiement == "esp" %} selected {% endif %} value="esp">Espéce</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="new_delai_paiement"><b>Délai de paiement</b></label>
+                            <select class="form-control" id="new_delai_paiement" name="new_delai_paiement">
+                                <option {% if obj.delai_paiement == "imm" %} selected {% endif %} value="imm">Immédiat</option>
+                                <option {% if obj.delai_paiement == "rec" %} selected {% endif %} value="rec">A réception</option>
+                                <option {% if obj.delai_paiement == "30j" %} selected {% endif %} value="30j">A 30 jours</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <label for="oservation"><b>Observation</b></label>
+                        <textarea type="date" class="form-control" id="observation" name="observation" >{{obj.observation}}</textarea>
+
+                    </div>   
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="confirmeUpdateFacture">Modifier</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+
+        var id_facture_avoir = document.getElementById('id_facture_avoir').value;
+        var montant_facture = document.getElementById('montant_ht').value;
+
+
+        $('#montant_ht').val('{{montant_ht|floatformat:2}}'+' '+'{{conf.devise}}');
+        $('#montant_ttc').val('{{montant_ttc|floatformat:2}}'+' '+'{{conf.devise}}');
+        $('#montant_tva').val('{{montant_tva|floatformat:2}}'+' '+'{{conf.devise}}');
+       
+        loadFactureItem()
+
+        if (montant_facture  == 0){
+            $('#validateBtn').prop('disabled', true);
+        }
+
+        $(document).on('click', '#addNewProduct', function(){
+            var produit = document.getElementById('product').value;
+            var qty = document.getElementById('qty').value;
+            var taux = document.getElementById('tva').value;
+
+            $.ajax({
+                url : "{% url 'commercial:addNewFactureProduct' %}",
+                type : "POST",
+                data : {
+                    'id_facture' : id_facture,
+                    'produit' : produit,
+                    'qty' : qty,
+                    'taux' : taux,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    alertify.set('notifier', 'position', 'top-right');
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    
+                    loadFactureItem();
+                    $('#montant_ht').val(parseFloat(response.montant_ht).toFixed(2)+' '+'{{conf.devise}}');
+                    $('#montant_ttc').val(parseFloat(response.montant_ttc).toFixed(2)+' '+'{{conf.devise}}');
+                    $('#montant_tva').val(parseFloat(response.montant_tva).toFixed(2)+' '+'{{conf.devise}}');
+                    $('#AjoutProduitAuDevis').modal('hide');
+                    $('#validateBtn').prop('disabled', false);
+                }
+            });
+        });
+
+        function loadFactureItem(){
+            $.ajax({
+                url : "{% url 'commercial:ApiFetchFactureAvoirItem' %}",
+                type : "GET",
+                data : {
+                    'id_facture_avoir' : id_facture_avoir,
+                },
+                success : function(data){
+                    if (data.length > 0){
+                        var devisBody = $('#factureItemLigne');
+                        devisBody.empty();
+
+                        $.each(data, function(index, p){
+
+                            var row = "<tr>";
+                                row +="<td>"+p.produit__designation+"</td>";
+                                row +="<td>"+p.produit__prix_vente+" {{conf.devise}}</td>";
+                                row +="<td>"+p.qty+"</td>";
+                                row +="<td>"+p.tva+" %</td>";
+                                row +="<td><b>"+p.ttc+" {{conf.devise}}</b></td>";
+                                row += "<td><button class='btn btn-danger shadow btn-xs sharp me-1' id='deleteBtn' data-id='"+ p.id +"' '><i class='fa fa-trash'></i></button>";
+                                row += "<button class='btn btn-warning shadow btn-xs sharp me-1' id='editBtn' data-id='"+ p.id +"' '><i class='fa fa-pencil'></i></button></td>";
+                                row +="</tr>";
+                                devisBody.append(row);
+                        });
+                                                
+                    }else{
+                        var row = "<tr><td colspan='6'><center><b>Veuillez ajouter des produits/Articles</b></center></td></tr>"; 
+                    }
+                    $('#factureItemLigne').html(row);
+                }
+            });
+        }
+
+        $(document).on('click', '#editBtn', function(){
+            var id_ligne = $(this).data('id');
+
+            $.ajax({
+                url :"{% url 'commercial:ApiFetchLigneAvoirDetails' %}",
+                type : "GET",
+                data : {'id_ligne' : id_ligne },
+                success : function(data){
+                    var i = data[0];
+
+                    $('#ligne_avoir_pr').val(i.produit__designation);
+                    $('#ligne_avoir_qty').val(i.qty);
+                    $('#id_ligne_avoir').val(i.id);
+
+                    $('#EditLigneAvoirModal').modal('show');
+                }
+            });
+            
+        });
+
+        $(document).on('click', '#confirmUpdLigneAvoir', function(){
+            var lign_facture_avoir = document.getElementById('id_ligne_avoir').value;
+            var qty_retour = document.getElementById('qty_retour').value;
+            var motif_retour = document.getElementById('motif_retour').value;
+            var if_reintegre = document.getElementById('if_reintegre').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiUpdateLigneFactureAvoir' %}",
+                type : 'POST',
+                data : {
+                    'lign_facture_avoir' : lign_facture_avoir,
+                    'qty_retour' : qty_retour,
+                    'motif_retour' : motif_retour,
+                    'if_reintegre' : if_reintegre,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadFactureItem();
+                    $('#EditLigneAvoirModal').modal('hide');
+
+                }
+            });
+
+        });
+
+        $(document).on('click','#deleteBtn', function(){
+            var id_ligne = $(this).data('id');
+            
+            $.ajax({
+                url : "{% url 'commercial:deleteLigneFacture' %}",
+                type : 'GET',
+                data : {
+                    'id_ligne' : id_ligne,
+                    'id_facture' : id_facture,
+                },
+                success : function(response){
+                    alertify.set('notifier', 'position', 'top-right');
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    
+                    loadFactureItem();
+                    $('#montant_ht').val(parseFloat(response.montant_ht).toFixed(2)+' '+'{{conf.devise}}');
+                    $('#montant_ttc').val(parseFloat(response.montant_ttc).toFixed(2)+' '+'{{conf.devise}}');
+                    $('#montant_tva').val(parseFloat(response.montant_tva).toFixed(2)+' '+'{{conf.devise}}');
+                    
+                    if (montant_facture  == 0){
+                        $('#validateBtn').prop('disabled', true);
+                    }
+                                
+
+                }
+            });
+        });
+        
+        $(document).on('click', '#validateBtn', function(){
+            var date_facturation = document.getElementById('date_facturation').value;
+            var montant_facture = document.getElementById('montant_ht').value;
+
+            if (date_facturation == "None"){
+                alertify.error("La date de facturation n'est pas configuré");
+            }else{
+                if (! montant_facture){
+                    alertify.error("La facture ne peux pas étre vide, veuillez ajouter des produits !");
+                }else{
+
+                    $.ajax({
+                        url : "{% url 'commercial:valideInvoice' %}",
+                        data : {
+                            'id_facture' : id_facture,
+                        },
+                        type : 'GET',
+                        success : function(response){
+                            response.messages.forEach(function(message) {
+                                if (message.tags.includes('success')) {
+                                    alertify.success(message.message);
+                                } else if (message.tags.includes('error')) {
+                                    alertify.error(message.message);
+                                }
+                            });
+                            window.location.href = '{% url "commercial:detailFacture" pk=0 %}'.replace('0', id_facture)
+                        },
+                    });
+
+                }
+            }
+        });
+
+        $(document).on('click', '#updateFactureBtn', function(){
+            var id_facture = $(this).data('id');
+         
+            $('#updateFactureDetails').modal('show');
+
+            $(document).on('click', "#confirmeUpdateFacture", function(){
+
+                var new_mode_paiement = document.getElementById('new_mode_paiement').value;
+                var new_delai_paiement  = document.getElementById('new_delai_paiement').value;
+                var new_client = document.getElementById('new_client').value;
+                var observation = document.getElementById('observation').value;
+                var new_date_facturation = document.getElementById('new_date_facturation').value;
+
+                $.ajax({
+                    url : "{% url 'commercial:ApiUpdateFacture' %}",
+                    type : "GET",
+                    data : {
+                        'id_facture' : id_facture,
+                        'new_mode_paiement' : new_mode_paiement,
+                        'new_delai_paiement' : new_delai_paiement,
+                        'new_client' : new_client,
+                        'observation' : observation,
+                        'new_date_facturation' : new_date_facturation,
+                    },
+                    success : function(response){
+                        
+                        $('#updateFactureDetails').modal('hide');
+                    
+                        response.messages.forEach(function(message) {
+                            if (message.tags.includes('success')) {
+                                alertify.success(message.message);
+                            } else if (message.tags.includes('error')) {
+                                alertify.error(message.message);
+                            }
+                        });
+
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 900);
+                    },  
+                });
+                
+            });
+            
+        });
+        
+    });
+</script>
+
+
+{% endblock content %}

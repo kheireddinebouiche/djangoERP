@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %} Etat du stock {% endblock title %}
+{% load static %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Stock</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Etat du stock</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductMouvModal">
+                            Nouvelle entrée/sortie stock
+                        </button>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="example3" class="display" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                       
+                                        <th>Produit/Article</th>
+                                        <th>Référence</th>
+                                        <th>Code barre</th>
+                                        <th>Qty</th>
+                                        <th>Qty. Min.</th>
+                                        <th>Crée le</th>
+                                        <th>Actions</th>
+                                    
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    {% for e in list %}
+                                        <tr>
+                                            
+                                            <td>{{e.product}}</td>
+                                            <td>{{e.product.ref}}</td>
+                                            <td>{{e.product.code_barre}}</td>
+                                            <td><strong>{{e.qty}}</strong></td>
+                                            <td style="color: red;"><strong>{% if e.product.stock_alert != None %} {{e.product.stock_alert}} {% else %} -- {% endif %}</strong></td>
+                                            
+                                            <td><a href="javascript:void(0);"><strong>{{e.created_at}}</strong></a></td>
+                                            <td>
+                                                <div class="d-flex">
+                                                    <a href="{% url 'commercial:update_produit' pk=e.id %}" class="btn btn-warning shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
+                                                    <a href="{% url 'commercial:details-produit' pk=e.id %}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-eye"></i></a>
+                                                    
+                                                    <a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+                                                </div>												
+                                            </td>												
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="addProductMouvModal" tabindex="-1" aria-labelledby="addProductMouvModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductMouvModalLabel">Ajouter un nouveau mouvement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="addProductForm" action="{% url 'commercial:nouvelle_entree_stock' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="product" class="form-label">Produit/Article</label>
+                        <select class="form-select" id="product" name="product">
+                            {% for p in produits %}
+                            <option value="{{p.id}}">{{p.designation}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="qty" class="form-label">Quantité </label>
+                        <input type="number" class="form-control" id="qty" name="qty" step="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description:</label>
+                        <textarea class="form-control" id="description" name="description"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type_mouvement" class="form-label">Type mouvement :</label>
+                        <select class="form-select" id="type_mouvement" name="type_mouvement">
+                            <option value="ent">Entrée</option>
+                            <option value="sor">Sortie</option>
+                        </select>
+                    </div>
+                    
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" form="addProductForm" class="btn btn-primary">Confirmer le mouvement</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

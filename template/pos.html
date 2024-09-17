@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% block title %} Point de vente {% endblock title %}
+
+{% block sidebarre %} {% include 'pos-sidebarre.html' %} {% endblock sidebarre %}
+{% block content %}
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <!-- <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Notes</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Liste de mes notes</a></li>
+            </ol>
+        </div> -->
+        <!-- row -->
+        <div class="row">
+            <div class="col-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <label for="id_caisse">N° Caisse</label>
+                                <input readonly ="text" class="form-control" id="id_caisse" value="{{last_caisse.num}}">
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="date_caisse">Date</label>
+                                <input readonly ="text" class="form-control" id="date_caisse" value="{{last_caisse.created_at}}">
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="date_caisse">Utilisateur</label>
+                                <input readonly ="text" class="form-control" id="date_caisse" value="{{last_caisse.user}}">
+                            </div>
+                            <div class="col-lg-3">
+                                <label for="id_vente">N° de vente</label>
+                                <input readonly type="text" class="form-control" name="id_vente" id="id_vente" value="{{last_session.num}}">
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-lg-12">
+                                    <a href="{% url 'commercial:colture_caisse' pk=last_caisse.id %}" class="btn btn-danger"> Cloturer la caisse </a>
+                                    <a href="{% url 'commercial:new_session' %}" class="btn btn-warning"> Nouvelle vente </a>
+                                </div>
+        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">   
+                    <div class="card-body">
+                        <div class="row">
+                            <label for="code_barre">Code barre produit</label>
+                            <input type="text" class="form-control" id="code_barre">
+                        </div>
+                        <div class="row">
+                            <label class="form-label">State</label>
+                            <select id="id_produit" name="id_produit" class="default-select form-control wide">
+                                <option selected>Choose...</option>
+                                {% for p in product %}
+                                    <option value="{{p.id}}">{{p.designation}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            
+            <div class="col-8">
+                <div class="card">   
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="lignesCaisseTable" class="table table-responsive-md" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>Produit/Article</th>
+                                        <th>Prix U </th>
+                                        <th>Qty</th>
+                                        <th>Total</th>
+                                        <th>Actions</th>  
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">   
+                    <div class="card-body">
+                        <div class="row">
+                            <label for="montant_session">Montant total :</label>
+                            <input readonly style="font-family: 'Courier New', Courier, monospace; font-size: 24px; font-weight: 700 ; text-align: right; background-color: #000; color: #0f0; border: 2px solid #0f0; padding: 5px; border-radius: 5px;" type="text" class="form-control" id="montant_session">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        var venteID = document.getElementById('id_vente').value;
+        $('#montant_session').val('{{montant_session|floatformat:2}}'+' '+'{{config.devise}}');
+
+        loadProductCaisseData();
+
+        $('#id_produit').change(function() {
+            var productId = $(this).val();
+            var qty = 1;  // Initialisez la quantité à 1 par défaut
+            if (productId !== "Choose...") {
+                $.ajax({
+                    url: "{% url 'commercial:add_product_to_sale' %}",  // Remplacez par l'URL correcte
+                    type: 'POST',
+                    data: {
+                        'product_id': productId,
+                        'vente_id' : venteID,
+                        'qty': qty,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            loadProductCaisseData(productId); // Passe l'ID du produit pour cibler la ligne ajoutée
+                            $('#montant_session').val(parseFloat(response.montant_session).toFixed(2)+' '+'{{config.devise}}');
+                        }else {
+                            alertify.error(response.message);
+                        }
+                    },  
+                    error: function() {
+                        alert('Une erreur est survenue.');
+                    }
+                });
+            }
+        });
+        
+        // Gestionnaire d'événement pour le changement de quantité
+        $(document).on('change', 'input[id^="qty_"]', function() {
+            var inputField = $(this);
+            var newQty = inputField.val();
+            var productId = inputField.attr('id').split('_')[1]; // Extraction de l'ID du produit à partir de l'ID de l'input
+            
+            if (newQty > 0) {
+                $.ajax({
+                    url: "{% url 'commercial:update_product_qty' %}",  // Remplacez par l'URL correcte
+                    type: 'POST',
+                    data: {
+                        'product_id': productId,
+                        'vente_id': venteID,
+                        'qty': newQty,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    
+                    success: function(response) {
+                        if (response.success) {
+                            loadProductCaisseData();  // Recharger les données après la mise à jour
+                            $('#montant_session').val(parseFloat(response.montant_session).toFixed(2)+' '+'{{config.devise}}');
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Une erreur est survenue.');
+                    }
+                });
+            } else {
+                alert('Veuillez entrer une quantité valide.');
+                inputField.val(1);  // Réinitialiser à 1 si une quantité non valide est entrée
+            }
+        });
+        
+        function loadProductCaisseData(newProductId = null) {
+            $.ajax({
+                url: "{% url 'commercial:lignes_caisse' %}",
+                type: 'GET',
+                success: function(data) {
+                    var tableBody = $("#lignesCaisseTable tbody");
+                    tableBody.empty();  // Clear existing table data
+                    
+                    $.each(data, function(index, p) {
+                        var row = "<tr>";
+                        row += "<td><b>" + p.product__designation + "</b></td>";
+                        row += "<td><b>" + p.prix_vente + " {{config.devise}}</b></td>";
+                        row += "<td><input type='number' class='form-control' id='qty_" + p.product + "' value='" + p.qty + "' min='1'></td>";
+                        row += "<td><b>" + (p.prix_vente * p.qty).toFixed(2) + " {{config.devise}}</b></td>";
+                        row += "<td><button class='btn btn-danger shadow btn-xs sharp me-1' id='deleteBtn' data-id='"+ p.product +"' '><i class='fa fa-trash'></i></button></td>";
+                        row += "</tr>";
+                        tableBody.append(row);
+                    });
+                    
+                    // Met le focus sur le champ quantité du produit nouvellement ajouté
+                    if (newProductId) {
+                        setTimeout(function() {
+                            $("#qty_" + newProductId).focus().select();
+                        }, 100);  // Un délai de 100 ms devrait suffire
+                    }
+                }
+            });
+        }
+
+        $(document).on('click','#deleteBtn', function(){
+            var id_product = $(this).data('id');
+            $.ajax({
+                url: "{% url 'commercial:remove_product_from_sale' %}",  // Remplacez par l'URL correcte
+                type: 'POST',
+                data: {
+                    'product_id': id_product,
+                    'vente_id': venteID,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        loadProductCaisseData();
+                        $('#montant_session').val(response.montant_session);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Une erreur est survenue.');
+                }
+            });
+
+        });
+    });
+
+        
+</script>
+
+{% endblock content %}
