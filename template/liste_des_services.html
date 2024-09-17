@@ -137,7 +137,8 @@
                 success: function(data){
                     var row = "";
 
-                    if(data.lenght>0){
+                    
+
                         $.each(data, function(index, p){
 
                             row += "<tr>";
@@ -150,9 +151,7 @@
                             row += "</tr>";
 
                         });
-                    }else{
-                        row += "<tr><td colspan='6' style='text-align:center;'><b>Aucun service, veuillez en créer !</b></td></tr>";
-                    }
+                   
 
                     
                     $('#serviceItemListeTableBody').html(row);
