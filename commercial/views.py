@@ -1786,15 +1786,22 @@ def delete_product(request, pk):
 @login_required(login_url='/login/')
 def PageListeService(request):
     categorie = Categorie_produit.objects.all()
-    print(categorie)
+    conf = GeneralSettings.objects.get()
+    
     context = {
         'categorie' : categorie,
+        'conf' : conf,
     }
     return render(request,"liste_des_services.html", context)
 
 @login_required(login_url='/login/')
 def ApiLoadService(request):
-    liste = Products.objects.filter(type_produit = "srv").values('designation','prix_vente','categorie','created_at','ref','disponibilite')
+    liste = Products.objects.filter(type_produit = "srv").values('id','designation','prix_vente','categorie','created_at','ref','disponibilite','type_tarifcation')
+    
+    for p in liste:
+        p_instance = Products.objects.get(id=p['id'])
+        p['type_tarifcation_label'] = p_instance.get_type_tarifcation_display()
+        
     return JsonResponse(list(liste), safe=False)
 
 @login_required(login_url='/login/')
@@ -1809,7 +1816,7 @@ def AddNewService(request):
         description = request.POST.get('description'),
 
 
-        obj_categorie = Categorie_produit.objects.get(id = dispo)
+        obj_categorie = Categorie_produit.objects.get(id = categorie)
 
         new_service = Products(
             user = request.user,
@@ -1832,6 +1839,82 @@ def AddNewService(request):
             })
 
         return JsonResponse({'messages': response_messages})
+
+@login_required(login_url='/login/')
+def ApiGetServiceDetails(request):
+    if request.method == 'GET':
+        id_service = request.GET.get('id_service')
+
+        obj = Products.objects.filter(id = id_service).values('id','user__username','ref','designation','prix_vente','type_tarifcation','created_at','categorie','disponibilite','description','updated_at')
+      
+        return JsonResponse(list(obj), safe=False)
+
+@login_required(login_url='/login/')
+def ApiUpdateService(request):
+    if request.method == "POST":
+
+        new_update_service_name  = request.POST.get('new_update_service_name')
+        new_update_service_ref = request.POST.get('new_update_service_ref')
+        new_update_service_tarif = request.POST.get('new_update_service_tarif')
+        update_type_tarification = request.POST.get('update_type_tarification')
+        update_categorie = request.POST.get('update_categorie')
+        update_dispo = request.POST.get('update_dispo')
+        udapte_description = request.POST.get('udapte_description')
+        service_id = request.POST.get('service_id')
+
+        obj = Products.objects.get(id = service_id)
+        categorie = Categorie_produit.objects.get(id = update_categorie)
+
+        obj.designation = new_update_service_name
+        obj.ref = new_update_service_ref
+        obj.prix_vente = new_update_service_tarif
+        obj.type_tarifcation = update_type_tarification
+        obj.categorie = categorie
+        obj.disponibilite = update_dispo
+        obj.description = udapte_description
+
+        obj.save()
+        messages.success(request,'Les informations du service ont été enregistrer avec succès')
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
+
+@login_required(login_url='/login/')
+def ApiDeleteService(request):
+    if request.method == "GET":
+        id_service = request.GET.get('id_service')
+
+        obj = Products.objects.get(id = id_service)
+
+        check = Ligne_Facture.objects.filter(produit = obj)
+
+        if check.count() > 0:
+            messages.error(request, "Le produit/service ne peux pas étre supprimer, référence trouvé dans 'FACTURE' ")
+            response_messages = []
+            for message in messages.get_messages(request):
+                response_messages.append({
+                    "message": message.message,
+                    "tags": message.tags,
+                })
+
+            return JsonResponse({'messages': response_messages})
+        else:
+            obj.delete()
+            
+            messages.success(request, "Le produit/service à été supprimer avec succès")
+            response_messages = []
+            for message in messages.get_messages(request):
+                response_messages.append({
+                    "message": message.message,
+                    "tags": message.tags,
+                })
+
+            return JsonResponse({'messages': response_messages})
 
 
 ############## GESTION DES PRODUITS ################################################
@@ -1913,8 +1996,7 @@ def ApiFetchProductDetails(request):
 
         return JsonResponse(data, safe=False)
 
-        
-
+    
 ############## CATEGORE DES PRODUITS ###############################################
 
 ############## STOCK DES PRODUITS ##################################################

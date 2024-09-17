@@ -125,6 +125,9 @@ urlpatterns = [
     path('gestion-des-produits/liste-des-services/', PageListeService, name="PageListeService"),
     path('ApiLoadService', ApiLoadService, name="ApiLoadService"),
     path('AddNewService', AddNewService, name="AddNewService"),
+    path('ApiGetServiceDetails', ApiGetServiceDetails, name="ApiGetServiceDetails"),
+    path('ApiUpdateService', ApiUpdateService, name="ApiUpdateService"),
+    path('ApiDeleteService', ApiDeleteService, name="ApiDeleteService"),
 
     # Fin Gestion des produits ############################################################################
 

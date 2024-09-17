@@ -31,9 +31,10 @@
                                     <tr>
                                         <th>Designation</th>
                                         <th>Référence</th>
-                                        <th>Prix</th>
+                                        <th>Prix HT</th>
+                                        <th>Tarification</th>
                                         <th>Disponibilité</th>
-                                        <th>Crée le</th>
+                                       
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -82,7 +83,7 @@
                         <div class="col-lg-6">
                             <label for="new_prenom"><b>Mode de tarification</b></label>
                             <select name="type_tarification" class="form-control" id="type_tarification">
-                                <option value="h">Horaire</option>
+                                <option value="h">Heure</option>
                                 <option value="m">Mensuelle</option>
                                 <option value="j">Jour</option>
                                 <option value="a">Année</option>
@@ -125,11 +126,197 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="detailsServiceModal" tabindex="-1" aria-labelledby="detailsServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsServiceModalLabel">Mise à jours des informations du service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label for="new_service_name"><b>Désignation du service</b></label>
+                            <input type="text" id="new_update_service_name" name="new_update_service_name" class="form-control" required>
+                            <input type="text" id="service_id" name="service_id" class="form-control" hidden readonly>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="new_service_ref"><b>Reférence</b></label>
+                            <input type="text" id="new_update_service_ref" name="new_update_service_ref" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-lg-6">
+                            <label for="new_service_tarif"><b>Tarif </b></label>
+                            <input type="number" id="new_update_service_tarif" name="new_update_service_tarif" class="form-control" step="0.1" required>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="new_prenom"><b>Mode de tarification</b></label>
+                            <select name="update_type_tarification" class="form-control" id="update_type_tarification">
+                                <option value="h">Heure</option>
+                                <option value="m">Mensuelle</option>
+                                <option value="j">Jour</option>
+                                <option value="a">Année</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="categorie">Catégorie du service</label>
+                            <select name="update_categorie" class="form-control" id="update_categorie">
+                                {% for cat in categorie %}
+                                    <option value="{{cat.id}}">{{cat.label}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="dispo">Disponibilité</label>
+                            <select class="form-control" name="update_dispo" id="update_dispo">
+                                <option value="1">Disponible</option>
+                                <option value="0">Non disponible</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="description">Description du service</label>
+                            <textarea name="udapte_description" id="udapte_description" class="form-control"></textarea>
+                        </div>
+                    </div>
+             
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="confirmUpdateBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailsServiceModal2" tabindex="-1" aria-labelledby="detailsServiceModal2Label" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsServiceModal2Label">Détails sur le service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label for="new_service_name"><b>Désignation du service</b></label>
+                            <input disabled type="text" id="new_update_service_name2" name="new_update_service_name2" class="form-control" required>
+                            <input type="text" id="service_id2" name="service_id2" class="form-control" hidden readonly>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="new_service_ref"><b>Reférence</b></label>
+                            <input disabled type="text" id="new_update_service_ref2" name="new_update_service_ref2" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-lg-6">
+                            <label for="new_service_tarif"><b>Tarif </b></label>
+                            <input disabled type="number" id="new_update_service_tarif2" name="new_update_service_tarif2" class="form-control" step="0.1" required>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="new_prenom"><b>Mode de tarification</b></label>
+                            <select disabled name="update_type_tarification2" class="form-control" id="update_type_tarification2">
+                                <option value="h">Heure</option>
+                                <option value="m">Mensuelle</option>
+                                <option value="j">Jour</option>
+                                <option value="a">Année</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-6">
+                            <label for="categorie">Catégorie du service</label>
+                            <select disabled name="update_categorie2" class="form-control" id="update_categorie2">
+                                {% for cat in categorie %}
+                                    <option value="{{cat.id}}">{{cat.label}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="dispo">Disponibilité</label>
+                            <select disabled class="form-control" name="update_dispo2" id="update_dispo2">
+                                <option value="1">Disponible</option>
+                                <option value="0">Non disponible</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="description">Description du service</label>
+                            <textarea disabled name="udapte_description2" id="udapte_description2" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mt-3">
+                        <div class="col-lg-4">
+                            <label for="created_by">Crée par</label>
+                            <input disabled type="text" name="created_by" id="created_by" class="form-control">
+                        </div>
+                        <div class="col-lg-4">
+                            <label for="created_at">Crée le</label>
+                            <input disabled type="text" name="created_at" id="created_at" class="form-control">
+                        </div>
+                        <div class="col-lg-4">
+                            <label for="updated_at">Dérniere modification</label>
+                            <input disabled type="text" name="updated_at" id="updated_at" class="form-control">
+                        </div>
+                        
+                    </div>
+             
+            </div>
+
+            <!-- Modal Footer -->
+            <!-- <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="confirmUpdateBtn">Confirmer</button>
+            </div> -->
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+               
+                <div class="mt-4 text-center" id="deleteModalBody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 
     $(document).ready(function(){
 
         loadItem();
+
         function loadItem(){
             $.ajax({
                 url : "{% url 'commercial:ApiLoadService' %}",
@@ -137,28 +324,34 @@
                 success: function(data){
                     var row = "";
 
-                    
+                    if(data.length > 0){
 
                         $.each(data, function(index, p){
-
                             row += "<tr>";
-                            row += "<td>"+p.designation+"</td>";
+                            row += "<td><b>"+p.designation+"</b></td>";
                             row += "<td>"+p.ref+"</td>";
-                            row += "<td>"+p.prix_vente+"</td>";
-                            row += "<td>"+p.disponibilite+"</td>";
-                            row += "<td>"+p.created_at+"</td>";
-                            row += "<td></td>";
+                            row += "<td> <b>"+p.prix_vente+" {{conf.devise}}</b></td>";
+                            row += "<td> <b>"+p.type_tarifcation_label+"</b></td>";
+                            row += "<td>"+(p.disponibilite == 1  ? '<span class="badge light badge-success"><i class="fa fa-circle text-success me-1"></i>Disponible</span>' : '<span class="badge light badge-danger"><i class="fa fa-circle text-danger me-1"></i>Non disponible</span>')+"</td>";
+                           
+                            row += "<td>";
+                                
+                            row += "<button data-id="+p.id+" class='btn btn-warning shadow btn-xs sharp me-1' id='editBTN'><i class='fas fa-pencil'></i></button>";
+                            row += "<button data-id="+p.id+" class='btn btn-primary shadow btn-xs sharp me-1' id='detailsBtn'><i class='fas fa-eye'></i></button>";
+                            row += "<button data-id='"+p.id+"' id='confirmDeleteBtn' class='btn btn-danger shadow btn-xs sharp me-1'><i class='fa fa-trash'></i></button>";
+                           
+
+                            row += "</td>";
                             row += "</tr>";
 
                         });
-                   
-
+                    }else{
+                        row += "<tr><td colspan='6' style='text-align:center;'><b>Aucun service, veuillez en créer !</b></td></tr>";
+                    }
                     
                     $('#serviceItemListeTableBody').html(row);
                 }
             });
-
-
         }
         
         $(document).on('click', '#addNewService', function(){
@@ -198,6 +391,133 @@
                 }
             });
         });
+        
+        $(document).on('click','#editBTN', function(){
+            var id_service = $(this).data('id');
+
+            $.ajax({
+                url : "{% url 'commercial:ApiGetServiceDetails' %}",
+                data : { 'id_service' : id_service},
+                type : 'GET',
+                success : function(data){
+                    var p = data[0];
+
+                    $('#new_update_service_name').val(p.designation);
+                    $('#new_update_service_ref').val(p.ref);
+                    $('#new_update_service_tarif').val(p.prix_vente);
+                    $('#update_categorie').val(p.categorie);
+                    $('#update_dispo').val(p.disponibilite);
+                    $('#udapte_description').val(p.description);
+                    $('#update_type_tarification').val(p.type_tarifcation);
+                    $('#service_id').val(p.id);
+
+                    $('#detailsServiceModal').modal('show');
+                }
+            });
+
+            
+        });
+        
+        $(document).on('click', '#confirmDeleteBtn', function(){
+            var id_service = $(this).data('id');
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer ce service</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion du service supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+id_service+"' id='deleteBtn'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+            $('#deleteRecordModal').modal('show');
+        })
+
+        $(document).on('click', '#confirmUpdateBtn', function(){
+            var new_update_service_name = document.getElementById('new_update_service_name').value;
+            var new_update_service_ref = document.getElementById('new_update_service_ref').value;
+            var new_update_service_tarif = document.getElementById('new_update_service_tarif').value;
+            var update_type_tarification = document.getElementById('update_type_tarification').value;
+            var update_categorie = document.getElementById('update_categorie').value;
+            var update_dispo = document.getElementById('update_dispo').value;
+            var udapte_description = document.getElementById('udapte_description').value;
+            var service_id = document.getElementById('service_id').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiUpdateService' %}",
+                type : 'POST',
+                data : {
+                    'new_update_service_name' : new_update_service_name,
+                    'new_update_service_ref' : new_update_service_ref,
+                    'new_update_service_tarif' : new_update_service_tarif,
+                    'update_type_tarification' : update_type_tarification,
+                    'update_categorie' : update_categorie,
+                    'update_dispo' : update_dispo,
+                    'udapte_description' : udapte_description,
+                    'service_id' : service_id,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadItem()
+                    $('#detailsServiceModal').modal('hide');
+                }
+            });
+
+        });
+
+        $(document).on('click', '#deleteBtn', function(){
+            var id_service = $(this).data('id');
+            $.ajax({
+                url : "{% url 'commercial:ApiDeleteService' %}",
+                type : 'GET',
+                data : {'id_service' : id_service},
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadItem();
+                    $('#deleteRecordModal').modal('hide');
+
+                }
+            });
+        });
+        
+        $(document).on('click', '#detailsBtn', function(){
+            var id_service = $(this).data('id');
+            $.ajax({
+                url : "{% url 'commercial:ApiGetServiceDetails' %}",
+                data : {'id_service' : id_service},
+                type : "GET",
+                success : function(data){
+                    var p = data[0];
+
+                    $('#new_update_service_name2').val(p.designation);
+                    $('#new_update_service_ref2').val(p.ref);
+                    $('#new_update_service_tarif2').val(p.prix_vente);
+                    $('#update_categorie2').val(p.categorie);
+                    $('#update_dispo2').val(p.disponibilite);
+                    $('#udapte_description2').val(p.description);
+                    $('#update_type_tarification2').val(p.type_tarifcation);
+                    $('#service_id2').val(p.id);
+                    $('#created_by').val(p.user__username);
+                    $('#updated_at').val(p.updated_at);
+                    $('#created_at').val(p.created_at);
+
+                    $('#detailsServiceModal2').modal('show');
+                }
+            });
+        });
+    
     });
 </script>
 
