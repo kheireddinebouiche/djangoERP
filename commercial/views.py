@@ -1808,6 +1808,7 @@ def AddNewService(request):
         dispo = request.POST.get('dispo')
         description = request.POST.get('description'),
 
+
         obj_categorie = Categorie_produit.objects.get(id = dispo)
 
         new_service = Products(
@@ -1819,6 +1820,7 @@ def AddNewService(request):
             categorie = obj_categorie,
             disponibilite = dispo,
             description = description,
+            type_produit = "srv",
         )
         new_service.save()
         messages.success(request, "Les informations ont été enregistrer avec succès")
