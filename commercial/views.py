@@ -1808,13 +1808,15 @@ def AddNewService(request):
         dispo = request.POST.get('dispo')
         description = request.POST.get('description'),
 
+        obj_categorie = Categorie_produit.objects.get(id = dispo)
+
         new_service = Products(
             user = request.user,
             designation = new_service_name,
             ref = new_service_ref,
             prix_vente = new_service_tarif,
             type_tarifcation = type_tarification,
-            categorie = categorie,
+            categorie = obj_categorie,
             disponibilite = dispo,
             description = description,
         )
