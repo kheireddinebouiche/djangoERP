@@ -1953,7 +1953,10 @@ def add_categorie(request):
 def ApiGetCategorieDetails(request):
     if request.method == "GET":
         id_cat = request.GET.get('id_cat')
-        obj = Categorie_produit.objects.filter(id = id_cat).values('id','label','description')
+        obj = Categorie_produit.objects.filter(id = id_cat).values('id','label','description','created_at','updated_at','user__username')
+        for item in obj:
+            item['created_at'] = item['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+            item['updated_at'] = item['updated_at'].strftime('%Y-%m-%d %H:%M:%S')
         return JsonResponse(list(obj), safe=False)
 
 @login_required(login_url='/login/')
