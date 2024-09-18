@@ -111,6 +111,7 @@ class Contact(models.Model):
 class Categorie_produit(models.Model):
     user = models.ForeignKey(User, on_delete = models.DO_NOTHING, null=True, blank=True)
     label = models.CharField(max_length=100, null=True, blank=True)
+    description = models.CharField(max_length=1000, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now= True, blank=True, null= True)
@@ -125,7 +126,7 @@ class Products(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
     designation = models.CharField(max_length = 100, blank=True, null = True)
     ref = models.CharField(max_length = 100, blank = True, null= True)
-    categorie = models.ForeignKey(Categorie_produit, null=True, blank=True, on_delete=models.DO_NOTHING)
+    categorie = models.ForeignKey(Categorie_produit, null=True, blank=True, on_delete=models.SET_NULL)
     TYPE_PROD = {
         ('srv','Service'),
         ('pro','Produit'),

@@ -144,12 +144,15 @@ urlpatterns = [
 
     # Categorie des produits ##############################################################################
     path('gestion-des-produits/categories/liste/',list_categorie, name='categorie_list'),
-    path('gestion-des-produits/categories/new/',add_categorie, name='ajouter_categorie'),
     path('gestion-des-produits/categories/update/',update_categorie, name='update_categorie'),
     path('gestion-des-produits/produit-par-categorie/', categorieProduit, name="categorieProduit"),
     path('ApiFetchProductCat', ApiFetchProductCat, name="ApiFetchProductCat"),
 
     path('ApiListCategorieProduit', ApiListCategorieProduit, name="ApiListCategorieProduit"),
+    path('ApiGetCategorieDetails', ApiGetCategorieDetails, name="ApiGetCategorieDetails"),
+    path('ApiAddCategorie', ApiAddCategorie, name="ApiAddCategorie"),
+    path('ApiUpdateCategorie', ApiUpdateCategorie, name="ApiUpdateCategorie"),
+    path('ApiDeleteCategorie', ApiDeleteCategorie, name="ApiDeleteCategorie"),
     # Fin Categorie des produits ##########################################################################
 
     # Categorie des notes #################################################################################

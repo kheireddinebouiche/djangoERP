@@ -1927,8 +1927,10 @@ def list_categorie(request):
 
 @login_required(login_url='/login/')
 def ApiListCategorieProduit(request):
-    liste = Categorie_produit.objects.all().value('id','label','created_at','updated_at', 'user')
-    return JsonResponse(list(liste), sage=False)
+    liste = Categorie_produit.objects.all().values('id','label','created_at','updated_at', 'user')
+    for item in liste:
+        item['created_at'] = item['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+    return JsonResponse(list(liste), safe=False)
 
 @login_required(login_url='/login/')
 def add_categorie(request):
@@ -1946,6 +1948,51 @@ def add_categorie(request):
         }
 
         return render(request, 'ajouter_categorie_produit.html', context)
+
+@login_required(login_url='/login/')
+def ApiGetCategorieDetails(request):
+    if request.method == "GET":
+        id_cat = request.GET.get('id_cat')
+        obj = Categorie_produit.objects.filter(id = id_cat).values('id','label','description')
+        return JsonResponse(list(obj), safe=False)
+
+@login_required(login_url='/login/')
+def ApiUpdateCategorie(request):
+    if request.method == "POST":
+        id_cat = request.POST.get('id_cat')
+        new_label = request.POST.get('new_categorie_label')
+        new_description = request.POST.get('new_categorie_description')
+        
+        obj = Categorie_produit.objects.get(id = id_cat)
+        obj.label = new_label
+        obj.description = new_description
+        obj.save()
+
+        messages.success(request, 'Les informations de la categorie ont été modifier avec succès')
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
+
+@login_required(login_url='/login/')
+def ApiDeleteCategorie(request):
+    if request.method == "GET":
+        id_cat = request.GET.get('id_cat')
+        obj = Categorie_produit.objects.get(id = id_cat)
+        obj.delete()
+        messages.success(request, 'La catégorie à été supprimer avec succès')
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
 
 @login_required(login_url='/login/')
 def update_categorie(request, pk):
@@ -1997,6 +2044,28 @@ def ApiFetchProductDetails(request):
         }
 
         return JsonResponse(data, safe=False)
+
+@login_required(login_url='/login/')
+def ApiAddCategorie(request):
+    if request.method == "POST":
+        label = request.POST.get('label')
+        description = request.POST.get('description')
+
+        new_obj = Categorie_produit(
+            user = request.user,
+            label = label,
+            description = description
+        )
+        new_obj.save()
+        messages.success(request, "La catégorie à été ajouter avec succès")
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
 
     
 ############## CATEGORE DES PRODUITS ###############################################

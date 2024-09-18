@@ -20,7 +20,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <a href="{% url 'commercial:nouveau-produit' %}" class="btn btn-primary"> Ajout rapide d'un categorie </a>
+                        <button type="button" id="addBtn" class="btn btn-primary"> Ajout rapide d'un categorie </button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -34,25 +34,104 @@
                                         
                                     </tr>
                                 </thead>
-                                <tbody >
-                                    {% for e in list %}
-                                        <tr>
-                                            
-                                            <td>{{e.label}}</td>
-                                            
-                                            <td><a href="javascript:void(0);"><strong>{{e.created_at}}</strong></a></td>
-                                            <td>
-                                                <div class="d-flex">
-                                                    <a href="{% url 'commercial:details-produit' pk=e.id %}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
-                                                    <a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
-                                                </div>												
-                                            </td>												
-                                        </tr>
-                                    {% endfor %}
+                                <tbody id="itemTableBody">
+                                    
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="AddCategorieProduit" tabindex="-1" aria-labelledby="AddCategorieProduitLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddCategorieProduitLabel">Ajout d'une catégorie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <label for="new_service_name"><b>Designation de la catégorie</b></label>
+                            <input type="text" id="categorie_label" name="categorie_label" class="form-control" required>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="description">Description</label>
+                            <textarea name="categorie_description" id="categorie_description" class="form-control"></textarea>
+                        </div>
+                    </div>
+             
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="confirmAddBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editCategorieModal" tabindex="-1" aria-labelledby="editCategorieModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategorieModalLabel">Modification des informations de la catégorie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <label for="new_service_name"><b>Designation de la catégorie</b></label>
+                            <input type="text" id="new_categorie_label" name="new_categorie_label" class="form-control" required>
+                            <input type="text" id="categorie_id" name="categorie_id" class="form-control" hidden readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="description">Description</label>
+                            <textarea name="new_categorie_description" id="new_categorie_description" class="form-control"></textarea>
+                        </div>
+                    </div>
+             
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="confirmUpdateBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+               
+                <div class="mt-4 text-center" id="deleteModalBody">
+
                 </div>
             </div>
         </div>
@@ -65,8 +144,140 @@
         loadItem();
 
         function loadItem(){
-
+            $.ajax({
+                url : "{% url 'commercial:ApiListCategorieProduit' %}",
+                type : "GET",
+                success : function(data){
+                    var row = "";
+                    if(data.length > 0){
+                        $.each(data, function(index, p){
+                            row += "<tr>";
+                            row += "<td><b>"+p.label+"</b></td>";
+                            row += "<td>"+p.created_at+"</td>";
+                            row += "<td>";
+                            row += "<button data-id="+p.id+" class='btn btn-warning shadow btn-xs sharp me-1' id='editBTN'><i class='fas fa-pencil'></i></button>";
+                            row += "<button data-id="+p.id+" class='btn btn-primary shadow btn-xs sharp me-1' id='detailsBtn'><i class='fas fa-eye'></i></button>";
+                            row += "<button data-id='"+p.id+"' id='confirmDeleteBtn' class='btn btn-danger shadow btn-xs sharp me-1'><i class='fa fa-trash'></i></button>";
+                            row += "</td>";
+                            row += "</tr>";
+                        });
+                    }else{
+                        row += "<tr><td colspan='3'><center><b>Aucune catégorie crée pour le moment !</b></center></td></tr>";
+                    }
+                    $('#itemTableBody').html(row);
+                }
+            });
         }
+
+        $(document).on('click', '#addBtn', function(){
+            $('#AddCategorieProduit').modal('show');
+        });
+
+        $(document).on('click', '#confirmAddBtn', function(){
+            var label = document.getElementById('categorie_label').value;
+            var description = document.getElementById('categorie_description').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiAddCategorie' %}",
+                data : {
+                    'label' : label,
+                    'description' : description,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                type : 'POST',
+                success: function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadItem()
+                    $('#AddCategorieProduit').modal('hide');
+                }
+            });
+        });
+
+        $(document).on('click', '#editBTN', function(){
+            var id_cat = $(this).data('id');
+            $.ajax({
+                url : "{% url 'commercial:ApiGetCategorieDetails' %}",
+                data : {'id_cat' : id_cat, },
+                type : "GET",
+                success: function(data){
+                    var p = data[0];
+
+                    $('#new_categorie_label').val(p.label);
+                    $('#categorie_id').val(p.id);
+                    $('#new_categorie_description').val(p.description);
+
+                    $('#editCategorieModal').modal('show');
+                }
+            });
+        });
+
+        $(document).on('click', '#confirmUpdateBtn', function(){
+            var id_cat = document.getElementById('categorie_id').value;
+            var new_categorie_label = document.getElementById('new_categorie_label').value;
+            var new_categorie_description = document.getElementById('new_categorie_description').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiUpdateCategorie' %}",
+                type : 'POST',
+                data : {
+                    'id_cat': id_cat,
+                    'new_categorie_label' : new_categorie_label,
+                    'new_categorie_description': new_categorie_description,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadItem()
+                    $('#editCategorieModal').modal('hide');
+                },  
+            });
+        });
+
+        $(document).on('click', '#confirmDeleteBtn', function(){
+            var id_cat = $(this).data('id');
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer cette catégorie de produit</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion de la catégorie supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+id_cat+"' id='deleteBtn'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+            $('#deleteRecordModal').modal('show');
+        });
+
+        $(document).on('click', '#deleteBtn', function(){
+            var id_cat = $(this).data('id');
+            $.ajax({
+                url : "{% url 'commercial:ApiDeleteCategorie' %}",
+                data : {'id_cat' : id_cat},
+                type : 'GET',
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadItem()
+                    $('#deleteRecordModal').modal('hide');
+                },
+            });
+        });
     });
 </script>
 
