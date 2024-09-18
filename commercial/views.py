@@ -1923,10 +1923,12 @@ def ApiDeleteService(request):
 @login_required(login_url='/login/')
 def list_categorie(request):
     list = Categorie_produit.objects.all()
-    context = {
-        'list' : list
-    }
-    return render(request, 'liste_categorie_produit.html', context)
+    return render(request, 'liste_categorie_produit.html')
+
+@login_required(login_url='/login/')
+def ApiListCategorieProduit(request):
+    liste = Categorie_produit.objects.all().value('id','label','created_at','updated_at', 'user')
+    return JsonResponse(list(liste), sage=False)
 
 @login_required(login_url='/login/')
 def add_categorie(request):

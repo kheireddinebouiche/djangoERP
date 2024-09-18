@@ -148,6 +148,8 @@ urlpatterns = [
     path('gestion-des-produits/categories/update/',update_categorie, name='update_categorie'),
     path('gestion-des-produits/produit-par-categorie/', categorieProduit, name="categorieProduit"),
     path('ApiFetchProductCat', ApiFetchProductCat, name="ApiFetchProductCat"),
+
+    path('ApiListCategorieProduit', ApiListCategorieProduit, name="ApiListCategorieProduit"),
     # Fin Categorie des produits ##########################################################################
 
     # Categorie des notes #################################################################################

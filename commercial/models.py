@@ -109,6 +109,7 @@ class Contact(models.Model):
         return self.name
 
 class Categorie_produit(models.Model):
+    user = models.ForeignKey(User, on_delete = models.DO_NOTHING, null=True, blank=True)
     label = models.CharField(max_length=100, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
