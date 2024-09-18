@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+{% block title %}Gestion de la TVA{% endblock title %}
+{% load static %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Faturation</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Catégories de la TVA</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" id="addBtn" class="btn btn-primary"> Ajouter </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-responsive" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                       
+                                        <th>Designation</th>
+                                        <th>Taux</th>
+                                        <th>Crée le</th>
+                                        <th>Actions</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody id="itemTableBody">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="AddTvaModalProduit" tabindex="-1" aria-labelledby="AddTvaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddTvaModalLabel">Ajout d'un nouveau taux</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label for="description"><b>Description</b></label>
+                            <input type="text" id="description" name="description" class="form-control" required>
+                            
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="taux">Taux</label>
+                            <input type="text" name="taux" id="taux" class="form-control">
+                        </div>
+                    </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="confirmAddBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="DetailsTauxProduit" tabindex="-1" aria-labelledby="DetailsTauxProduitLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="DetailsTauxProduitLabel">Détails sur le taux</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label for="last_description"><b>Description</b></label>
+                        <input type="text" id="last_description" name="last_description" readonly class="form-control" >
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="last_taux">Taux en %</label>
+                        <input type="text" name="last_taux" id="last_taux" readonly class="form-control">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-lg-4">
+                        <label for="last_created_by"><b>Crée par </b></label>
+                        <input type="text" id="last_created_by" name="last_created_by" readonly class="form-control" >
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="last_created_at">Crée le</label>
+                        <input type="text" name="last_created_at" id="last_created_at" readonly class="form-control">
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="last_updated_at">Dérnier modification</label>
+                        <input type="text" name="last_updated_at" id="last_updated_at" readonly class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editTauxModal" tabindex="-1" aria-labelledby="editTauxModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTauxModalLabel">Modification des informations de la catégorie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <label for="new_description"><b>Description</b></label>
+                        <input type="text" id="new_description" name="new_description" class="form-control" required>
+                        <input type="text" id="taux_id" name="taux_id" class="form-control" hidden readonly>
+                        
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="new_taux">Taux en %</label>
+                        <input type="text" name="new_taux" id="new_taux" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="confirmUpdateBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+               
+                <div class="mt-4 text-center" id="deleteModalBody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+
+        loadItem();
+
+        function loadItem(){
+            $.ajax({
+                url : "{% url 'commercial:ApiGetListeTva' %}",
+                type : "GET",
+                success : function(data){
+                    var row = "";
+                    if(data.length > 0){
+                        $.each(data, function(index, p){
+                            row += "<tr>";
+                            row += "<td><b>"+p.description+"</b></td>";
+                            row += "<td><b>"+p.taux+" %</b></td>";
+                            row += "<td><b>"+p.created_at+"</b></td>";
+                            row += "<td>";
+                            row += "<button data-id="+p.id+" class='btn btn-warning shadow btn-xs sharp me-1' id='editBTN'><i class='fas fa-pencil'></i></button>";
+                            row += "<button data-id="+p.id+" class='btn btn-primary shadow btn-xs sharp me-1' id='detailsBtn'><i class='fas fa-eye'></i></button>";
+                            row += "<button data-id='"+p.id+"' id='confirmDeleteBtn' class='btn btn-danger shadow btn-xs sharp me-1'><i class='fa fa-trash'></i></button>";
+                            row += "</td>";
+                            row += "</tr>";
+                        });
+                    }else{
+                        row += "<tr><td colspan='3'><center><b>Aucune catégorie crée pour le moment !</b></center></td></tr>";
+                    }
+                    $('#itemTableBody').html(row);
+                }
+            });
+        }
+
+        $(document).on('click', '#addBtn', function(){
+            $('#AddTvaModalProduit').modal('show');
+        });
+
+        $(document).on('click', '#confirmAddBtn',function(){
+            var descripton = document.getElementById('description').value;
+            var taux = document.getElementById('taux').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiAddTaux' %}",
+                type : 'POST',
+                data : {
+                    'description' : descripton,
+                    'taux' : taux,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadItem();
+                    $('#AddTvaModalProduit').modal('hide');
+                },
+            });
+        });
+    
+        $(document).on('click', '#confirmDeleteBtn', function(){
+            var id_taux = $(this).data('id');
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer le taux</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion du taux supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+id_taux+"' id='deleteBtn'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+            $('#deleteRecordModal').modal('show');
+        });
+    
+        $(document).on('click','#deleteBtn', function(){
+            var id_taux = $(this).data('id');
+            $.ajax({
+                url : '{% url "commercial:ApiDeleteTaux" %}',
+                data : {'id_taux' : id_taux},
+                type : 'GET',
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadItem();
+                    $('#deleteRecordModal').modal('hide');
+                },  
+            });
+        });
+        
+        $(document).on('click', '#editBTN', function(){
+            var id_taux = $(this).data('id');
+
+            $.ajax({
+                url : "{% url 'commercial:ApiGetTauxDetails' %}",
+                data : {'id_taux':id_taux},
+                type : 'GET',
+                success : function(data){
+                    var p = data[0];
+
+                    $('#new_description').val(p.description);
+                    $('#new_taux').val(p.taux);
+                    $('#taux_id').val(p.id);
+
+                }
+            });
+            $('#editTauxModal').modal('show');
+        });
+        
+        $(document).on('click', '#confirmUpdateBtn', function(){
+            var id_taux = document.getElementById('taux_id').value;
+            var taux = document.getElementById('new_taux').value;
+            var description = document.getElementById('new_description').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiUpdateTaux' %}",
+                type : 'POST',
+                data : {
+                    'id_taux' : id_taux,
+                    'taux' : taux,
+                    'description' : description,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadItem();
+                    $('#editTauxModal').modal('hide');
+                }
+
+            });
+        });
+        
+        $(document).on('click', '#detailsBtn',function(){
+            var id_taux = $(this).data('id');
+            $.ajax({
+                url : "{% url 'commercial:ApiGetTauxDetails' %}",
+                data : {'id_taux' : id_taux},
+                type : 'GET',
+                success: function(data){
+                    var p = data[0];
+
+                    $('#last_description').val(p.description);
+                    $('#last_taux').val(p.taux);
+
+                    $('#last_created_by').val(p.user__username);
+                    $('#last_created_at').val(p.created_at);
+                    $('#last_updated_at').val(p.updated_at);
+
+                    $('#DetailsTauxProduit').modal('show');
+                }
+            });
+
+            
+        });
+    
+    });
+</script>
+
+{% endblock content %}

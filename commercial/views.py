@@ -2322,6 +2322,7 @@ def nouveau_rappele(request):
 
 ############## GESTION DES RAPPELS #################################################
 
+@login_required(login_url='/login/')
 def configuration(request):
     conf= GeneralSettings.objects.get()
     try:
@@ -2363,6 +2364,97 @@ def configuration(request):
         }
 
         return render(request, 'configuration.html', context)
+
+@login_required(login_url='/login/')
+def PageTva(request):
+    return render(request,'liste_tva.html')
+
+@login_required(login_url='/login/')
+def ApiGetListeTva(request):
+
+    liste = Tva.objects.all().values('id','description','taux','created_at')
+    for item in liste:
+        item['created_at'] = item['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+    return JsonResponse(list(liste), safe=False)
+
+@login_required(login_url='/login/')
+def ApiAddTaux(request):
+    if request.method == "POST":
+        description = request.POST.get('description')
+        taux = request.POST.get('taux')
+
+        new_taux = Tva(
+            user = request.user,
+            description = description,
+            taux = taux
+        )
+        new_taux.save()
+        messages.success(request, "Les informations ont été enregistrer avec succès")
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
+
+@login_required(login_url='/login/')
+def ApiDeleteTaux(request):
+    if request.method == 'GET':
+        id_taux = request.GET.get('id_taux')
+
+        obj = Tva.objects.get(id = id_taux)
+        obj.delete()
+        messages.success(request,"Le taux à été supprimer avec succès")
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
+    
+@login_required(login_url='/login/')
+def ApiGetTauxDetails(request):
+    if request.method == 'GET':
+
+        id_taux = request.GET.get('id_taux')
+
+        obj = Tva.objects.filter(id = id_taux).values('id','user__username','description','taux','created_at','updated_at')
+        
+        for item in obj:
+            item['created_at'] = item['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+            item['updated_at'] = item['updated_at'].strftime('%Y-%m-%d %H:%M:%S')
+    
+        return JsonResponse(list(obj), safe=False)
+    
+@login_required(login_url='/login/')
+def ApiUpdateTaux(request):
+    if request.method =="POST":
+        id_taux = request.POST.get('id_taux')
+        taux = request.POST.get('taux')
+        description = request.POST.get('description')
+
+        obj = Tva.objects.get(id = id_taux)
+
+        obj.taux = taux
+        obj.description = description
+        obj.save()
+        messages.success(request,"Le taux à été modifier avec succès")
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
+        
+
+
+
 
 
 

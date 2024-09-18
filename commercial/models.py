@@ -655,8 +655,12 @@ class LigneCaisse(models.Model):
         return self.product
 
 class Tva(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.CharField(max_length=100, null=True, blank=True)
     taux = models.CharField(max_length=100, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name="Taux"

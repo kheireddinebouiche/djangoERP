@@ -160,5 +160,11 @@ urlpatterns = [
     path('notes/nouvelle-note/',add_note, name="ajouter_note"),
     # Categorie des notes #################################################################################
 
+    path('configuration/facturation/liste-des-taux/',PageTva, name="PageTva"),
+    path('ApiGetListeTva', ApiGetListeTva, name="ApiGetListeTva"),
+    path('ApiAddTaux', ApiAddTaux, name="ApiAddTaux"),
+    path('ApiDeleteTaux', ApiDeleteTaux, name="ApiDeleteTaux"),
+    path('ApiGetTauxDetails', ApiGetTauxDetails, name="ApiGetTauxDetails"),
+    path('ApiUpdateTaux', ApiUpdateTaux, name="ApiUpdateTaux"),
 
 ]
