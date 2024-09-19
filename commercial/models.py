@@ -517,13 +517,19 @@ class LigneFactureAvoir(models.Model):
 
 class Bons_commande(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    fournisseur = models.ForeignKey(Fournisseurs, on_delete=models.SET_NULL, null=True, blank=True)
     number = models.CharField(max_length=1000, null=True, blank=True)
     date_du_bon = models.DateField(null=True, blank=True)
     date_livraison = models.DateField(null=True, blank=True)
-
     ref_devis = models.CharField(max_length=1000, null=True, blank=True)
     observation = models.CharField(max_length=1000, null=True, blank=True)
 
+    ETAT_COMMANDE = {
+        ('bro', 'Brouillon'),
+        ('val', 'Valider'),
+        ('ann', 'Annuler'),
+    }
+    etat = models.CharField(max_length=3, null=True, blank=True, choices=ETAT_COMMANDE, default="bro")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

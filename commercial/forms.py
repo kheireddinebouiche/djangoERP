@@ -248,8 +248,29 @@ class ParamGenForm(forms.ModelForm):
             'print_ticket_pdf': forms.RadioSelect(attrs={'class' : 'form-control', 'id' : 'selec_impr'}),
         }
 
+class CreatedBonCommande(forms.ModelForm):
+    class Meta:
+        model = Bons_commande
+        fields = ['fournisseur','date_du_bon','date_livraison','ref_devis','etat','observation']
+        labels = {
+            'fournisseur' : "Veuillez indiquer le fournisseur :",
+            'date_du_bon' : "Date de la commande :",
+            'date_livraison' : "Date de livraison :",
+            'ref_devis' : "Veuillez indiquer la référence du devis :",
+            'observation' : "Observation :",
+        }
+        widgets = {
+            'fournisseur': forms.Select(attrs={'class': 'form-control'}),
+            'date_du_bon': forms.TextInput(attrs={'class':'form-control', 'type':'date'}),
+            'date_livraison': forms.TextInput(attrs={'class':'form-control', 'type':'date'}),
+            'ref_devis' : forms.TextInput(attrs={'class':'form-control'}),
+            'etat' : forms.Select(attrs={'class':'form-control'}),
+            'observation' : forms.TextInput(attrs={'class':'form-control'}),
+            
+        }
+
 class CreateBonLivraisonForm(forms.ModelForm):
     class Meta:
         model = Bons_livraison
-        fields = ['fournisseur','date_du_bon','lieu_livraison','observation']
+        fields = ['fournisseur','date_du_bon','lieu_livraison','observation',]
         pass

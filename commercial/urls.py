@@ -167,4 +167,10 @@ urlpatterns = [
     path('ApiGetTauxDetails', ApiGetTauxDetails, name="ApiGetTauxDetails"),
     path('ApiUpdateTaux', ApiUpdateTaux, name="ApiUpdateTaux"),
 
+    ################### GESTION DES COMMANDES #############################################################
+    path('achats/bons-de-commandes/',PageListeCommande, name="PageListeCommande"),
+    path('ApiGetListeCommande',ApiGetListeCommande,name="ApiGetListeCommande"),
+    path('achats/bons-de-commandes/nouvelle-commande/',CreateBonCommande, name="CreateBonCommande"),
+    ################### GESTION DES COMMANDES #############################################################
+
 ]

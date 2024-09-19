@@ -2453,8 +2453,40 @@ def ApiUpdateTaux(request):
         return JsonResponse({'messages': response_messages})
         
 
+############# GESTION DES BONS DE COMMANDE ###################################################################
+@login_required(login_url='/login/')
+def PageListeCommande(request):
+    return render(request, 'liste_des_commandes.html')
 
+@login_required(login_url='/login/')
+def ApiGetListeCommande(request):
+    if request.method == "GET":
+        liste = Bons_commande.objects.all().values('id','fournisseur','created_at','number','date_du_bon')
+        return JsonResponse(list(liste), safe=False)
 
+@login_required(login_url='/login/')
+def CreateBonCommande(request):
+    form = CreatedBonCommande()
+    if request.method == "POST":
+        form = CreateBonCommande(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Le bon de commande à été créer avec succès")
+            return redirect('commercial:ConfCommande', form.id)
+        else:
+            messages.error(request, "Une erreur c'est produite lors du traitement de la requete")
+            return redirect('commercial:CreateBonCommande')
+
+    context = {
+        'form' : form
+    }
+    return render(request,'add_commande.html', context)
+
+@login_required(login_url='/login/')
+def ConfCommande(request, pk):
+    return render(request, 'configuration_commande.html')
+
+############# GESTION DES BONS DE COMMANDE ###################################################################
 
 
 
