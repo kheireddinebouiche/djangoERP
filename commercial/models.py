@@ -515,6 +515,101 @@ class LigneFactureAvoir(models.Model):
     def __str__(self):
         return self.ref_facture_avoir
 
+class Bons_commande(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    number = models.CharField(max_length=1000, null=True, blank=True)
+    date_du_bon = models.DateField(null=True, blank=True)
+    date_livraison = models.DateField(null=True, blank=True)
+
+    ref_devis = models.CharField(max_length=1000, null=True, blank=True)
+    observation = models.CharField(max_length=1000, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.number:
+            self.number = self.generate_bon_commande_number()
+        super().save(*args, **kwargs)
+
+    def generate_bon_commande_number(self):
+        now = datetime.datetime.now()
+        date_str = now.strftime('%Y')
+        last_bon_commande = Bons_commande.objects.filter(number__startswith=date_str).order_by('-number').first()
+        if last_bon_commande:
+            last_number = int(last_bon_commande.number[-4:])
+            new_number = last_number + 1
+        else:
+            new_number = 1
+        return f'{date_str}-{new_number:04}'
+
+    class Meta:
+        verbose_name="Bon de commande"
+        verbose_name_plural = "Bons de commande"
+    
+    def __str__(self):
+        return self.number
+
+class Lignes_BonCommande(models.Model):
+    pass
+
+class Bons_livraison(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    number = models.CharField(max_length=1000, null=True, blank=True)
+    fournisseur = models.ForeignKey(Fournisseurs, null=True, blank=True, on_delete=models.SET_NULL)
+    date_du_bon = models.DateField(null=True, blank=True)
+    lieu_livraison = models.CharField(max_length=1000, null=True, blank=True)
+
+    observation = models.CharField(max_length=1000, null=True, blank=True)
+
+    montant_total = models.DecimalField(decimal_places=2, max_digits=1000, null=True, blank=True)
+    montant_paye =  models.DecimalField(decimal_places=2, max_digits=1000, null=True, blank=True)
+    montant_restant = models.DecimalField(decimal_places=2, max_digits=1000, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.number:
+            self.number = self.generate_bon_livraison_number()
+        super().save(*args, **kwargs)
+
+    def generate_bon_livraison_number(self):
+        now = datetime.datetime.now()
+        date_str = now.strftime('%Y')
+        last_bon_livraison = Bons_livraison.objects.filter(number__startswith=date_str).order_by('-number').first()
+        if last_bon_livraison:
+            last_number = int(last_bon_livraison.number[-4:])
+            new_number = last_number + 1
+        else:
+            new_number = 1
+        return f'{date_str}-{new_number:04}'
+
+    class Meta:
+        verbose_name="Bon de livraison"
+        verbose_name_plural = "Bons de livraison"
+
+    def __str__(self):
+        return self.number
+
+class Lignes_bon_livraison(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    bon_livraison = models.ForeignKey(Bons_livraison, on_delete=models.CASCADE, null=True, blank=True)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE, null=True, blank=True)
+
+    qty = models.CharField(max_length=100, null=True, blank=True)
+    total = models.DecimalField(decimal_places=2, max_digits=1000, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name="Ligne du bon de livraison"
+        verbose_name_plural = "Lignes du bon de livraison"
+
+    def __str__(self):
+        return self.product.designation
+
 class PaiementClient(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     facture = models.ForeignKey(Facture, on_delete=models.CASCADE, null=True, blank=True)

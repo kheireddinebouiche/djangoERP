@@ -247,3 +247,9 @@ class ParamGenForm(forms.ModelForm):
             'logo' : forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'image'}),
             'print_ticket_pdf': forms.RadioSelect(attrs={'class' : 'form-control', 'id' : 'selec_impr'}),
         }
+
+class CreateBonLivraisonForm(forms.ModelForm):
+    class Meta:
+        model = Bons_livraison
+        fields = ['fournisseur','date_du_bon','lieu_livraison','observation']
+        pass

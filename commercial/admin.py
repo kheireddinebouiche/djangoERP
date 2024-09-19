@@ -47,6 +47,13 @@ class FactureAdmin(admin.ModelAdmin):
 class LigneFactureClass(admin.ModelAdmin):
     list_display = ('id','produit', 'qty', 'ht', 'tva', 'ttc')
 
+@admin.register(Bons_livraison)
+class BonsLivraisonClass(admin.ModelAdmin):
+    list_display = ('id', 'number', 'fournisseur' ,'montant_total', 'montant_paye', 'montant_restant')
+
+@admin.register(Lignes_bon_livraison)
+class LignesBonLivraisonClass(admin.ModelAdmin):
+    list_display = ('id', 'user', 'bon_livraison','qty','total','created_at')
 
 admin.site.register(RetourProduit)
 admin.site.register(PaiementClient)
