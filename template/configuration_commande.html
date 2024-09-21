@@ -303,6 +303,22 @@
     </div>
 </div>
 
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+               
+                <div class="mt-4 text-center" id="deleteModalBody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function(){
 
@@ -420,6 +436,45 @@
             }); 
 
            
+        });
+        
+        $(document).on('click', '#deleteBtn', function(){
+            var id_ligne_commande = $(this).data('id');
+
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer le produit de la commande</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion ce cette ligne supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+id_ligne_commande+"' id='confirmDeleteBtn'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+            $('#deleteRecordModal').modal('show');
+            
+        });
+        
+        $(document).on('click','#confirmDeleteBtn', function(){
+            var id_ligne_commande = $(this).data('id');
+
+            $.ajax({
+                url : '{% url "commercial:ApiDeleteLigneCommande" %}',
+                type : 'GET',
+                data : {
+                    'id_ligne_commande' : id_ligne_commande,
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadCommandeItem();
+                    $('#deleteRecordModal').modal('hide');
+                },
+            });
         });
     });
 </script>

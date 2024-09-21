@@ -2584,6 +2584,22 @@ def ApiAddCommandeLine(request):
 
         return JsonResponse({'messages': response_messages})
 
+@login_required(login_url='/login/')
+def ApiDeleteLigneCommande(request):
+    if request.method == "GET":
+        id_ligne_commande = request.GET.get('id_ligne_commande')
+        obj = Lignes_BonCommande.objects.get(id = id_ligne_commande)
+        obj.delete()
+        messages.success(request,"La requete à été effectuer avec succès")
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
+
 
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
