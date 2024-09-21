@@ -557,7 +557,33 @@ class Bons_commande(models.Model):
         return self.number
 
 class Lignes_BonCommande(models.Model):
-    pass
+    user = models.ForeignKey(User, on_delete=models.SET, null=True, blank=True)
+    ref_commande = models.ForeignKey(Bons_commande, on_delete=models.CASCADE, null=True, blank=True)
+    produit = models.ForeignKey(Products, on_delete=models.CASCADE, null=True, blank=True)
+
+    qty = models.CharField(max_length=100, null=True, blank=True)
+    total = models.DecimalField(max_digits=100, decimal_places=2, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name="Ligne bon de commande"
+        verbose_name_plural = "Lignes bon de commande"
+
+    def __str__(self):
+        return self.ref_commande
+    
+    def save(self, *args, **kwargs):
+        if self.produit and self.qty:
+            try:
+                qty_float = float(self.qty)
+                prix_achat = self.produit.prix_achat
+                self.total = qty_float * prix_achat  # Calcul du total
+            except ValueError:
+                self.total = 0  # Gestion d'erreur si la quantité n'est pas un nombre
+        super().save(*args, **kwargs)
+
 
 class Bons_livraison(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)

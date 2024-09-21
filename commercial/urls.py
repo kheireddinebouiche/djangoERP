@@ -174,6 +174,7 @@ urlpatterns = [
     path('achat/bons-de-commandes/configuration/<int:pk>/',ConfCommande, name="ConfCommande"),
     path('ApiGetProducts/',ApiGetProducts,name="ApiGetProducts"),
     path('ApiConfirmAddNewProduct',ApiConfirmAddNewProduct,name="ApiConfirmAddNewProduct"),
+    path('ApiFetchCommandeItem',ApiFetchCommandeItem, name="ApiFetchCommandeItem"),
     ################### GESTION DES COMMANDES #############################################################
 
 ]

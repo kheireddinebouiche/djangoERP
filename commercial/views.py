@@ -2541,7 +2541,16 @@ def ApiConfirmAddNewProduct(request):
             })
 
         return JsonResponse({'messages': response_messages})
-        
+
+@login_required(login_url='/login/')
+def ApiFetchCommandeItem(request):
+    if request.method == "GET":
+        id_commande = request.GET.get('id_commande')
+        obj = Bons_commande.objects.get(id = id_commande)
+        liste = Lignes_BonCommande.objects.filter(ref_commande = obj).value('id','produit__designation','produit__prix_achat','qty','total')
+
+        return JsonResponse(list(liste), safe=False)
+
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
 

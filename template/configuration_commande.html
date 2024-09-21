@@ -107,14 +107,13 @@
                                 <thead>
                                     <tr>
                                         <th>Produit/Article</th>
-                                        <th>Prix U </th>
+                                        <th>Prix d'achat </th>
                                         <th>Qty</th>
-                                        <th>TVA</th>
-                                        <th>Total TTC</th>
+                                        <th>Total</th>
                                         <th>Actions</th>  
                                     </tr>
                                 </thead>
-                                <tbody id="factureItemLigne">
+                                <tbody id="CommandeLignItems">
                                     
                                 </tbody>
                             </table>
@@ -308,28 +307,27 @@
     $(document).ready(function(){
 
         loadProducts();
-          
+        loadCommandeItem();
 
-        function loadFactureItem(){
+        function loadCommandeItem(){
             $.ajax({
-                url : "{% url 'commercial:ApiFetchFactureItem' %}",
+                url : "{% url 'commercial:ApiFetchCommandeItem' %}",
                 type : "GET",
                 data : {
-                    'id_facture' : id_facture
+                    'id_commande' : id_commande
                 },
                 success : function(data){
                     if (data.length > 0){
-                        var devisBody = $('#factureItemLigne');
+                        var devisBody = $('#CommandeLignItems');
                         devisBody.empty();
 
                         $.each(data, function(index, p){
 
                             var row = "<tr>";
                                 row +="<td>"+p.produit__designation+"</td>";
-                                row +="<td>"+p.produit__prix_vente+" {{conf.devise}}</td>";
+                                row +="<td>"+p.produit__prix_achat+" {{conf.devise}}</td>";
                                 row +="<td>"+p.qty+"</td>";
-                                row +="<td>"+p.tva+" %</td>";
-                                row +="<td><b>"+p.ttc+" {{conf.devise}}</b></td>";
+                                row +="<td><b>"+p.total+" {{conf.devise}}</b></td>";
                                 row += "<td><button class='btn btn-danger shadow btn-xs sharp me-1' id='deleteBtn' data-id='"+ p.id +"' '><i class='fa fa-trash'></i></button></td>";
                                 row +="</tr>";
                                 devisBody.append(row);
@@ -338,7 +336,7 @@
                     }else{
                         var row = "<tr><td colspan='6'><center><b>Veuillez ajouter des produits/Articles</b></center></td></tr>"; 
                     }
-                    $('#factureItemLigne').html(row);
+                    $('#CommandeLignItems').html(row);
                 }
             });
         }
