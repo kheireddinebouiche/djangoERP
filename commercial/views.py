@@ -2468,11 +2468,27 @@ def ApiGetListeCommande(request):
 def CreateBonCommande(request):
     form = CreatedBonCommande()
     if request.method == "POST":
-        form = CreateBonCommande(request.POST)
+        form = CreatedBonCommande(request.POST)
         if form.is_valid():
-            form.save()
+            
+            date_du_bon = form.cleaned_data.get('date_du_bon')
+            date_livraison = form.cleaned_data.get('date_livraison')
+            observation = form.cleaned_data.get('observation')
+            fournisseur = form.cleaned_data.get('fournisseur')
+            ref_devis = form.cleaned_data.get('ref_devis')
+
+            new_commande = Bons_commande(
+                user = request.user,
+                date_du_bon = date_du_bon,
+                date_livraison = date_livraison,
+                observation = observation,
+                fournisseur = fournisseur,
+                ref_devis = ref_devis,    
+            )
+            new_commande.save()
+
             messages.success(request, "Le bon de commande à été créer avec succès")
-            return redirect('commercial:ConfCommande', form.id)
+            return redirect('commercial:ConfCommande', new_commande.id)
         else:
             messages.error(request, "Une erreur c'est produite lors du traitement de la requete")
             return redirect('commercial:CreateBonCommande')
@@ -2484,7 +2500,19 @@ def CreateBonCommande(request):
 
 @login_required(login_url='/login/')
 def ConfCommande(request, pk):
-    return render(request, 'configuration_commande.html')
+    obj = Bons_commande.objects.get(id = pk)
+    tva = Tva.objects.all()
+
+    context = {
+        'obj' : obj,
+        'tva' : tva,
+    }
+    return render(request, 'configuration_commande.html', context)
+
+@login_required(login_url='/login/')
+def ApiGetProducts(request):
+    liste = Products.objects.all().values('id','designation')
+    return JsonResponse(list(liste), safe=False)
 
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
