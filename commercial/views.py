@@ -2515,6 +2515,7 @@ def ApiGetProducts(request):
     return JsonResponse(list(liste), safe=False)
 
 @login_required(login_url='/login/')
+@transaction.atomic
 def ApiConfirmAddNewProduct(request):
     if request.method == 'POST':
         new_product_add = request.POST.get('new_product_add')
