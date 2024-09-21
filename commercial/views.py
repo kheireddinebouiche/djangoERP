@@ -2456,7 +2456,11 @@ def ApiUpdateTaux(request):
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 @login_required(login_url='/login/')
 def PageListeCommande(request):
-    return render(request, 'liste_des_commandes.html')
+    conf = GeneralSettings.objects.get()
+    context = {
+        'conf' : conf,
+    }
+    return render(request, 'liste_des_commandes.html',context)
 
 @login_required(login_url='/login/')
 def ApiGetListeCommande(request):
@@ -2546,10 +2550,40 @@ def ApiConfirmAddNewProduct(request):
 def ApiFetchCommandeItem(request):
     if request.method == "GET":
         id_commande = request.GET.get('id_commande')
+        print(id_commande)
         obj = Bons_commande.objects.get(id = id_commande)
-        liste = Lignes_BonCommande.objects.filter(ref_commande = obj).value('id','produit__designation','produit__prix_achat','qty','total')
+
+        liste = Lignes_BonCommande.objects.filter(ref_commande = obj).values('id','produit__designation','produit__prix_achat','qty','total')
 
         return JsonResponse(list(liste), safe=False)
+
+@login_required(login_url='/login/')
+def ApiAddCommandeLine(request):
+    if request.method == 'POST':
+        produit  = request.POST.get('produit')
+        qty = request.POST.get('qty')
+        id_commande = request.POST.get('id_commande')
+
+        obj = Bons_commande.objects.get(id = id_commande)
+        pro_obj = Products.objects.get(id = produit)
+
+        new_line_commande = Lignes_BonCommande(
+            user = request.user,
+            ref_commande = obj,
+            produit = pro_obj,
+            qty = qty,
+        )
+        new_line_commande.save()
+        messages.success(request,"La requête à été executer avec succès !")
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
+
 
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 

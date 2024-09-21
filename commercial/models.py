@@ -572,12 +572,12 @@ class Lignes_BonCommande(models.Model):
         verbose_name_plural = "Lignes bon de commande"
 
     def __str__(self):
-        return self.ref_commande
+        return self.ref_commande.number
     
     def save(self, *args, **kwargs):
         if self.produit and self.qty:
             try:
-                qty_float = float(self.qty)
+                qty_float = int(self.qty)
                 prix_achat = self.produit.prix_achat
                 self.total = qty_float * prix_achat  # Calcul du total
             except ValueError:

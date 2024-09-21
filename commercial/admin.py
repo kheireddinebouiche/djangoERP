@@ -62,3 +62,13 @@ admin.site.register(Prospects)
 admin.site.register(Rappels)
 admin.site.register(GeneralSettings)
 admin.site.register(Infos_Entreprise)
+
+
+
+@admin.register(Lignes_BonCommande)
+class BonCommandeClass(admin.ModelAdmin):
+    list_display = ('id','ref_commande','produit','qty','total')
+
+@admin.register(Bons_commande)
+class BonCommandeClass(admin.ModelAdmin):
+    list_display = ('id','number','created_at','etat')

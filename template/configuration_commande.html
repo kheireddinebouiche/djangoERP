@@ -97,7 +97,7 @@
             <div class="col-8">
                 <div class="card">
                     <div class="card-header">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AjoutProduitAuDevis">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AjoutDuProduitCommande">
                            Ajouter
                           </button>
                     </div>
@@ -147,12 +147,12 @@
 </div>
 
 <!-- The Modal -->
-<div class="modal fade" id="AjoutProduitAuDevis" tabindex="-1" aria-labelledby="AjoutProduitAuDevisLabel" aria-hidden="true">
+<div class="modal fade" id="AjoutDuProduitCommande" tabindex="-1" aria-labelledby="AjoutDuProduitCommandeLabel" aria-hidden="true">
     <div class="modal-dialog modal-md">
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
-                <h5 class="modal-title" id="AjoutProduitAuDevisLabel">Formulaire d'ajout de produit</h5>
+                <h5 class="modal-title" id="AjoutDuProduitCommandeLabel">Formulaire d'ajout de produit</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -309,7 +309,9 @@
         loadProducts();
         loadCommandeItem();
 
+             
         function loadCommandeItem(){
+            var id_commande = document.getElementById('id_commande').value;
             $.ajax({
                 url : "{% url 'commercial:ApiFetchCommandeItem' %}",
                 type : "GET",
@@ -334,7 +336,7 @@
                         });
                                                 
                     }else{
-                        var row = "<tr><td colspan='6'><center><b>Veuillez ajouter des produits/Articles</b></center></td></tr>"; 
+                        var row = "<tr><td colspan='5'><center><b>Veuillez ajouter des produits/Articles</b></center></td></tr>"; 
                     }
                     $('#CommandeLignItems').html(row);
                 }
@@ -360,6 +362,29 @@
             var produit = document.getElementById('product').value;
             var qty = document.getElementById('qty').value;
             var taux = document.getElementById('tva').value;
+            var id_commande = document.getElementById('id_commande').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiAddCommandeLine' %}",
+                type : 'POST',
+                data : {
+                    'produit' : produit,
+                    'qty' : qty,
+                    'id_commande' : id_commande,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadCommandeItem();
+                    $('#AjoutDuProduitCommande').modal('hide');
+                },
+            });
 
         });   
         
@@ -390,7 +415,7 @@
                     });
                     loadProducts();
                     $('#AddNewProd').modal('hide');
-                    $('#AjoutProduitAuDevis').modal('show');
+                    $('#AjoutDuProduitCommande').modal('show');
                 }
             }); 
 

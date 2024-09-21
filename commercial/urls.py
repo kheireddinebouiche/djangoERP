@@ -175,6 +175,7 @@ urlpatterns = [
     path('ApiGetProducts/',ApiGetProducts,name="ApiGetProducts"),
     path('ApiConfirmAddNewProduct',ApiConfirmAddNewProduct,name="ApiConfirmAddNewProduct"),
     path('ApiFetchCommandeItem',ApiFetchCommandeItem, name="ApiFetchCommandeItem"),
+    path('ApiAddCommandeLine', ApiAddCommandeLine, name="ApiAddCommandeLine"),
     ################### GESTION DES COMMANDES #############################################################
 
 ]
