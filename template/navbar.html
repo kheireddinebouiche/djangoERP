@@ -76,15 +76,20 @@
             <!-- Gestion des Clients & Fournissuer -->
                 <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
                     <i class="flaticon-025-dashboard"></i>
-                    <span class="nav-text">Clients & Fournisseurs</span>
+                    <span class="nav-text">Clients</span>
                 </a>
                     <ul aria-expanded="false">
                         <li><a href="{% url 'commercial:client-list' %}">Liste des clients</a></li>
-                        <li><a href="{% url 'commercial:liste_fournisseur' %}">Liste des fournissseurs</a></li>
-                        <li><hr></li>
                         <li><a href="{% url 'commercial:add-client' %}">Ajouter un client</a></li>
+                    </ul>
+                </li>
+                <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+                    <i class="flaticon-025-dashboard"></i>
+                    <span class="nav-text">Fournisseurs</span>
+                </a>
+                    <ul aria-expanded="false">
+                        <li><a href="{% url 'commercial:liste_fournisseur' %}">Liste des fournissseurs</a></li>                       
                         <li><a href="{% url 'commercial:nouveau_fournisseur' %}">Ajouter un fournisseur</a></li>
-                    
                     </ul>
                 </li>
             <!-- Gestion des Clients & Fournissuer -->
