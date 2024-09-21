@@ -2514,6 +2514,33 @@ def ApiGetProducts(request):
     liste = Products.objects.all().values('id','designation')
     return JsonResponse(list(liste), safe=False)
 
+@login_required(login_url='/login/')
+def ApiConfirmAddNewProduct(request):
+    if request.method == 'POST':
+        new_product_add = request.POST.get('new_product_add')
+        new_ref_add = request.POST.get('new_ref_add')
+        new_type_produit = request.POST.get('new_type_produit')
+        new_prix_achat = request.POST.get('new_prix_achat')
+
+        new_product = Products(
+            user = request.user,
+            designation = new_product_add,
+            ref = new_ref_add,
+            type_produit = new_type_produit,
+            prix_achat = new_prix_achat,
+        )
+
+        new_product.save()
+        messages.success(request,"Le nouveau produit à été ajouter avec succès !")
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
+        
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
 

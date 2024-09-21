@@ -219,6 +219,15 @@
               <label for="new_ref_add">Référence</label>
               <input type="text" class="form-control" id="new_ref_add">
 
+              <label for="new_type_produit">Type produit</label>
+              <select name="new_type_produit" class="form-control" id="new_type_produit">
+                <option value="pro">Produit</option>
+                <option value="srv">Service</option>
+              </select>
+
+              <label for="new_prix_achat">Prix de vente</label>
+              <input type="number" class="form-control" id="new_prix_achat" step="0.1">
+
             </div>
 
             <!-- Modal Footer -->
@@ -357,8 +366,37 @@
         });   
         
         $(document).on('click', '#addNewProductToDataBase', function(){
-            $('#AddNewProd').modal('hide');
-            $('#AjoutProduitAuDevis').modal('show');
+
+            var new_product_add  = document.getElementById('new_product_add').value;
+            var new_ref_add = document.getElementById('new_ref_add').value;
+            var new_type_produit = document.getElementById('new_type_produit').value;
+            var new_prix_achat = document.getElementById('new_prix_achat').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiConfirmAddNewProduct' %}",
+                type: 'POST',
+                data : {
+                    'new_product_add' : new_product_add,
+                    'new_ref_add' : new_ref_add,
+                    'new_type_produit' : new_type_produit,
+                    'new_prix_achat' : new_prix_achat,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadProducts();
+                    $('#AddNewProd').modal('hide');
+                    $('#AjoutProduitAuDevis').modal('show');
+                }
+            }); 
+
+           
         });
     });
 </script>
