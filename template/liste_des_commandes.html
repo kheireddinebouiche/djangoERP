@@ -204,7 +204,7 @@
                         $.each(data, function(index, p){
                             row += "<tr>";
                             row += "<td><b>"+p.number+"</b></td>";
-                            row += "<td>"+p.fournisseur+"</td>";
+                            row += "<td>"+p.fournisseur__designation+"</td>";
                             row += "<td>"+p.date_du_bon+"</td>";
                             row += "<td>"+p.created_at+"</td>";
                             row += "<td>";
@@ -320,24 +320,24 @@
         });
 
         $(document).on('click', '#confirmDeleteBtn', function(){
-            var id_cat = $(this).data('id');
+            var id_commande = $(this).data('id');
             var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
 
-            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer cette catégorie de produit</h4>" +
-                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion de la catégorie supprimera toutes les informations dans la base de données. </p>" +
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer ce bon de commande</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion de cette commande supprimera toutes les informations dans la base de données. </p>" +
                 "<div class = 'hstack gap-2 justify-content-center remove'>" +
                 "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
-                "<button class ='btn btn-primary' data-id='"+id_cat+"' id='deleteBtn'> Confirmer la suppréssion </button> </div>";
+                "<button class ='btn btn-primary' data-id='"+id_commande+"' id='deleteBtn'> Confirmer la suppréssion </button> </div>";
 
             $('#deleteModalBody').html(lab+content);
             $('#deleteRecordModal').modal('show');
         });
 
         $(document).on('click', '#deleteBtn', function(){
-            var id_cat = $(this).data('id');
+            var id_bon_commande = $(this).data('id');
             $.ajax({
-                url : "{% url 'commercial:ApiDeleteCategorie' %}",
-                data : {'id_cat' : id_cat},
+                url : "{% url 'commercial:ApiDeleteBonCommande' %}",
+                data : {'id_bon_commande' : id_bon_commande},
                 type : 'GET',
                 success : function(response){
                     response.messages.forEach(function(message) {
@@ -347,7 +347,7 @@
                             alertify.error(message.message);
                         }
                     });
-                    loadItem()
+                    loadItem();
                     $('#deleteRecordModal').modal('hide');
                 },
             });

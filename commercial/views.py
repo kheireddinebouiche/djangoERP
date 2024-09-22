@@ -2465,7 +2465,7 @@ def PageListeCommande(request):
 @login_required(login_url='/login/')
 def ApiGetListeCommande(request):
     if request.method == "GET":
-        liste = Bons_commande.objects.all().values('id','fournisseur','created_at','number','date_du_bon')
+        liste = Bons_commande.objects.all().values('id','fournisseur__designation','created_at','number','date_du_bon')
         return JsonResponse(list(liste), safe=False)
 
 @login_required(login_url='/login/')
@@ -2591,6 +2591,22 @@ def ApiDeleteLigneCommande(request):
         obj = Lignes_BonCommande.objects.get(id = id_ligne_commande)
         obj.delete()
         messages.success(request,"La requete à été effectuer avec succès")
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
+
+@login_required(login_url='/login/')
+def ApiDeleteBonCommande(request):
+    if request.method == 'GET':
+        id_commande = request.GET.get('id_bon_commande')
+        obj = Bons_commande.objects.get(id = id_commande)
+        obj.delete()
+        messages.success(request, 'Le bon de commande à été supprimer avec succès')
         response_messages = []
         for message in messages.get_messages(request):
             response_messages.append({

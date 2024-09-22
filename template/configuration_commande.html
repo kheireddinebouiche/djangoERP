@@ -73,7 +73,7 @@
                                         <a href="" class="btn btn-primary"> Brouillon </a>
                                     {% endif %}
                                     {% if request.user.is_staff %}
-                                        <a href="" class="btn btn-danger"> Supprimer </a>
+                                        <button data-id="{{obj.id}}" id="BtnDeleteBonCommande" class="btn btn-danger"> Supprimer </button>
                                     {% endif %}
                                 </div>
                             </div>
@@ -476,6 +476,45 @@
                 },
             });
         });
+    
+        $(document).on('click', '#BtnDeleteBonCommande', function(){
+            var id_commande = $(this).data('id');
+
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer le bon de commande</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion ce bon de commande supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+id_commande+"' id='confirmDeleteBtnCommande'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+            $('#deleteRecordModal').modal('show');
+        });
+
+        $(document).on('click','#confirmDeleteBtnCommande', function(){
+            var id_commande = $(this).data('id');
+            console.log(id_commande);
+
+            $.ajax({
+                url : "{% url 'commercial:ApiDeleteBonCommande' %}",
+                data : {'id_bon_commande' : id_commande},
+                type : 'GET',
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadCommandeItem();
+                    $('#deleteRecordModal').modal('hide');
+                    window.location.href= "{% url 'commercial:PageListeCommande' %}";
+                },
+            });
+        });
+    
     });
 </script>
 
