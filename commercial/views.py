@@ -2617,6 +2617,13 @@ def ApiDeleteBonCommande(request):
         return JsonResponse({'messages': response_messages})
 
 
+@login_required(login_url='/login/')
+def ApiGetCommandeDetails(request):
+    if request.method == "GET":
+        id_commande = request.GET.get('id_commande')
+        obj = Bons_commande.objects.get(id = id_commande)
+
+        pass
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
 
