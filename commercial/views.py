@@ -1861,6 +1861,7 @@ def ApiUpdateService(request):
         update_dispo = request.POST.get('update_dispo')
         udapte_description = request.POST.get('udapte_description')
         service_id = request.POST.get('service_id')
+        
 
         obj = Products.objects.get(id = service_id)
         categorie = Categorie_produit.objects.get(id = update_categorie)
@@ -2506,10 +2507,18 @@ def CreateBonCommande(request):
 def ConfCommande(request, pk):
     obj = Bons_commande.objects.get(id = pk)
     tva = Tva.objects.all()
+    fournisseur = Fournisseurs.objects.all()
+
+    try:
+        total = Lignes_BonCommande.objects.filter(ref_commande = obj).aggregate(total=Sum('total')['total'])
+    except:
+        total = 0
 
     context = {
         'obj' : obj,
         'tva' : tva,
+        'total' : total,
+        'fournisseur' : fournisseur,
     }
     return render(request, 'configuration_commande.html', context)
 
@@ -2623,7 +2632,13 @@ def ApiGetCommandeDetails(request):
         id_commande = request.GET.get('id_commande')
         obj = Bons_commande.objects.get(id = id_commande)
 
-        pass
+        commande = Bons_commande.objects.filter(id = id_commande).values('id','user__username','date_du_bon','fournisseur__designation','date_livraison')
+        return JsonResponse(list(commande), safe=False)
+
+
+@login_required(login_url='/login/')
+def ApiUpdateCommande(request):
+    pass
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
 

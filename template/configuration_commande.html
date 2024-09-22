@@ -125,20 +125,9 @@
                 <div class="card">   
                     <div class="card-body">
                         <div class="row">
-                            <label for="montant_ht">Montant HT :</label>
-                            <input readonly  type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_ht" >
+                            <label for="montant_ht">Montant Total :</label>
+                            <input readonly  type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_total" >
                         </div>
-
-                        <div class="row">
-                            <label for="montant_tva">Montant TVA :</label>
-                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_tva">
-                        </div>
-
-                        <div class="row">
-                            <label for="montant_ttc">Montant TTC :</label>
-                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_ttc">
-                        </div>
-
                     </div>
                 </div>
             </div>
@@ -254,36 +243,29 @@
                     
                     <div class="row">
                         <div class="col-lg-12">
-                            <label for="client"><b>Client</b></label>
-                            <select class="form-control" name="new_client" id="new_client">
-                                {% for c in clients %}
-                                    <option value="{{c.id}}" {% if obj.client.id == c.id %} selected {% endif %}>{{c.designation}} </option>
+                            <label for="new_fournisseur"><b>Client</b></label>
+                            <select class="form-control" name="new_fournisseur" id="new_fournisseur">
+                                <option>-----------------------</option>
+                                {% for c in fournisseur %}
+                                    <option value="{{c.id}}" {% if obj.fournisseur.id == c.id %} selected {% endif %}>{{c.designation}} </option>
                                 {% endfor %} 
                             </select>
                         </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-lg-12">
-                            <label for="new_date_facturation"><b>Date de facturation</b></label>
-                            <input type="date" class="form-control" id="new_date_facturation" name="new_date_facturation" value="{{ obj.date_facturation|date:'Y-m-d' }}">
+                            <label for="new_date_date_commande"><b>Date de la commande</b></label>
+                            <input type="date" class="form-control" id="new_date_date_commande" name="new_date_date_commande" value="{{ obj.date_du_bon|date:'Y-m-d' }}">
                         </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-lg-6">
-                            <label for="new_mode_paiement"><b>Mode de paiement </b></label>
-                            <select class="form-control" name="new_mode_paiement" id="new_mode_paiement">
-                                <option {% if obj.mode_paiement == "chq" %} selected {% endif %} value="chq">Chéque</option>
-                                <option {% if obj.mode_paiement == "vir" %} selected {% endif %} value="vir">Virement Bancaire</option>
-                                <option {% if obj.mode_paiement == "esp" %} selected {% endif %} value="esp">Espéce</option>
-                            </select>
+                            <label for="new_date_livraison"><b>Date de livraison </b></label>
+                            <input type="date" class="form-control" id="new_date_livraison" name="new_date_livraison" value="{{ obj.date_livraison|date:'Y-m-d' }}">
                         </div>
                         <div class="col-lg-6">
-                            <label for="new_delai_paiement"><b>Délai de paiement</b></label>
-                            <select class="form-control" id="new_delai_paiement" name="new_delai_paiement">
-                                <option {% if obj.delai_paiement == "imm" %} selected {% endif %} value="imm">Immédiat</option>
-                                <option {% if obj.delai_paiement == "rec" %} selected {% endif %} value="rec">A réception</option>
-                                <option {% if obj.delai_paiement == "30j" %} selected {% endif %} value="30j">A 30 jours</option>
-                            </select>
+                            <label for="new_ref_devis"><b>Référence du devis </b></label>
+                            <input type="text" class="form-control" id="new_ref_devis" name="new_ref_devis" value="{{ obj.ref_devis }}">
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -297,7 +279,7 @@
             <!-- Modal Footer -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                <button type="submit" class="btn btn-warning" id="confirmeUpdateFacture">Modifier</button>
+                <button type="submit" class="btn btn-warning" id="confirmUpdateCommande">Modifier</button>
             </div>
         </div>
     </div>
@@ -516,22 +498,34 @@
         });
         
         $(document).on('click', '#updateCommandeDetailsBtn', function(){
-            var id_commande = $(this).data('id');
-            
+            $('#updateCommandeDetailsModal').modal('show');
+        });
+
+        $(document).on('click','#confirmUpdateCommande', function(){
+            var id_commande = document.getElementById('id_commande').value;
+            var new_fournisseur = document.getElementById('new_fournisseur').value;
+            var new_date_date_commande = document.getElementById('new_date_date_commande').value;
+            var new_date_livraison = document.getElementById('new_date_livraison').value;
+            var new_ref_devis = document.getElementById('new_ref_devis').value;
+            var observation = document.getElementById('observation').value;
+
             $.ajax({
-                url : "{% url 'commercial:ApiGetCommandeDetails' %}",
-                type : 'GET',
+                url : '{% url "commercial:ApiUpdateCommande" %}',
+                type : 'POST',
                 data : {
                     'id_commande': id_commande,
+                    'new_fournisseur': new_fournisseur,
+                    'new_date_date_commande': new_date_date_commande,
+                    'new_date_livraison': new_date_livraison,
+                    'new_ref_devis': new_ref_devis,
+                    'observation': observation,
                 },
-                success : function(data){
-                    var p = data[0];
-
-
-                    $('#updateCommandeDetailsModal').modal('show');
-                },
+                
             });
+
+
         });
+        
     });
 </script>
 
