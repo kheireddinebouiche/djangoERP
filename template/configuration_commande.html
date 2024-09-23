@@ -341,7 +341,7 @@
                             var row = "<tr>";
                                 row +="<td>"+p.produit__designation+"</td>";
                                 row +="<td>"+p.produit__prix_achat+" {{conf.devise}}</td>";
-                                row +="<td><b><button style='margin-right:3px;border:none; background : transparent;' type='button' id='MinusBtn'>-</button>"+p.qty+"<button style='margin-left:3px;border:none; background : transparent;' type='button' id='PlusBtn'>+</button></b></td>";
+                                row +="<td><b><button data-id='"+p.id+"' style='margin-right:3px;border:none; background : transparent;' type='button' id='MinusBtn'>-</button>"+p.qty+"<button data-id='"+p.id+"' style='margin-left:3px;border:none; background : transparent;' type='button' id='PlusBtn'>+</button></b></td>";
                                 row +="<td><b>"+p.total+" {{conf.devise}}</b></td>";
                                 row += "<td><button class='btn btn-danger shadow btn-xs sharp me-1' id='deleteBtn' data-id='"+ p.id +"' '><i class='fa fa-trash'></i></button></td>";
                                 row +="</tr>";
@@ -557,6 +557,40 @@
 
         });
         
+        $(document).on('click','#MinusBtn', function(){
+            var id_ligne_commande = $(this).data('id');
+            var action = "minus";
+
+            $.ajax({
+                url : "{% url 'commercial:ApiUpdateQty'  %}",
+                type: 'GET',
+                data : {
+                    'id_ligne_commande' : id_ligne_commande,
+                    'action' : action,
+                },
+                success : function(response){
+
+                },
+            });
+        });
+        $(document).on('click','#PlusBtn', function(){
+            var id_ligne_commande = $(this).data('id');
+            var action = "plus";
+
+            $.ajax({
+                url : "{% url 'commercial:ApiUpdateQty'  %}",
+                type: 'GET',
+                data : {
+                    'id_ligne_commande' : id_ligne_commande,
+                    'action' : action,
+                },
+                success : function(response){
+
+                },
+            });
+        });
+
+
     });
 </script>
 

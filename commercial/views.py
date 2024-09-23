@@ -2679,6 +2679,17 @@ def ApiLoadTotalCommande(request):
         
         return JsonResponse({'total' : total}, safe=False)
 
+@login_required(login_url='/login/')
+def ApiUpdateQty(request):
+    if request.method == 'GET':
+        action = request.GET.get('action')
+        id_ligne_commande = request.GET.get('id_ligne_commande')
+
+        if action == 'plus':
+            pass
+        else:
+            pass
+
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
 
