@@ -127,7 +127,7 @@
                         <div class="row">
                             <label for="montant_ht">Montant Total :</label>
                             <input readonly  type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_total" >
-                        </div>
+                             </div>
                     </div>
                 </div>
             </div>
@@ -306,7 +306,22 @@
 
         loadProducts();
         loadCommandeItem();
+        loadTotalCommande();
 
+        function loadTotalCommande(){
+            var id_commande = document.getElementById('id_commande').value;
+            $.ajax({
+                url : "{% url 'commercial:ApiLoadTotalCommande' %}",
+                type: 'GET',
+                data : {
+                    'id_commande' : id_commande,
+                },
+                success: function(data){
+                    
+                    $('#montant_total').val(parseFloat(data.total).toFixed(2) +" {{conf.devise}}");
+                },
+            });
+        }
              
         function loadCommandeItem(){
             var id_commande = document.getElementById('id_commande').value;
@@ -326,7 +341,7 @@
                             var row = "<tr>";
                                 row +="<td>"+p.produit__designation+"</td>";
                                 row +="<td>"+p.produit__prix_achat+" {{conf.devise}}</td>";
-                                row +="<td>"+p.qty+"</td>";
+                                row +="<td><b><button style='margin-right:3px;border:none; background : transparent;' type='button' id='MinusBtn'>-</button>"+p.qty+"<button style='margin-left:3px;border:none; background : transparent;' type='button' id='PlusBtn'>+</button></b></td>";
                                 row +="<td><b>"+p.total+" {{conf.devise}}</b></td>";
                                 row += "<td><button class='btn btn-danger shadow btn-xs sharp me-1' id='deleteBtn' data-id='"+ p.id +"' '><i class='fa fa-trash'></i></button></td>";
                                 row +="</tr>";
@@ -380,6 +395,7 @@
                         }
                     });
                     loadCommandeItem();
+                    loadTotalCommande();
                     $('#AjoutDuProduitCommande').modal('hide');
                 },
             });
@@ -454,6 +470,7 @@
                         }
                     });
                     loadCommandeItem();
+                    loadTotalCommande();
                     $('#deleteRecordModal').modal('hide');
                 },
             });
@@ -519,7 +536,21 @@
                     'new_date_livraison': new_date_livraison,
                     'new_ref_devis': new_ref_devis,
                     'observation': observation,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+
+                    setTimeout(function() {
+                            window.location.reload();
+                        }, 900);
+                }
                 
             });
 

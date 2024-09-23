@@ -179,6 +179,8 @@ urlpatterns = [
     path('ApiDeleteLigneCommande',ApiDeleteLigneCommande,name="ApiDeleteLigneCommande"),
     path('ApiDeleteBonCommande',ApiDeleteBonCommande,name="ApiDeleteBonCommande"),
     path('ApiGetCommandeDetails', ApiGetCommandeDetails, name="ApiGetCommandeDetails"),
+    path('ApiUpdateCommande',ApiUpdateCommande,name="ApiUpdateCommande"),
+    path('ApiLoadTotalCommande',ApiLoadTotalCommande,name="ApiLoadTotalCommande"),
     ################### GESTION DES COMMANDES #############################################################
 
 ]

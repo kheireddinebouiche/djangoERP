@@ -2508,9 +2508,10 @@ def ConfCommande(request, pk):
     obj = Bons_commande.objects.get(id = pk)
     tva = Tva.objects.all()
     fournisseur = Fournisseurs.objects.all()
+    conf = GeneralSettings.objects.get()
 
     try:
-        total = Lignes_BonCommande.objects.filter(ref_commande = obj).aggregate(total=Sum('total')['total'])
+        total = Lignes_BonCommande.objects.filter(ref_commande = obj).aggregate(total=Sum('total'))['total']
     except:
         total = 0
 
@@ -2519,12 +2520,13 @@ def ConfCommande(request, pk):
         'tva' : tva,
         'total' : total,
         'fournisseur' : fournisseur,
+        'conf' : conf,
     }
     return render(request, 'configuration_commande.html', context)
 
 @login_required(login_url='/login/')
 def ApiGetProducts(request):
-    liste = Products.objects.all().values('id','designation')
+    liste = Products.objects.filter(type_produit = "pro").values('id','designation')
     return JsonResponse(list(liste), safe=False)
 
 @login_required(login_url='/login/')
@@ -2625,7 +2627,6 @@ def ApiDeleteBonCommande(request):
 
         return JsonResponse({'messages': response_messages})
 
-
 @login_required(login_url='/login/')
 def ApiGetCommandeDetails(request):
     if request.method == "GET":
@@ -2635,10 +2636,49 @@ def ApiGetCommandeDetails(request):
         commande = Bons_commande.objects.filter(id = id_commande).values('id','user__username','date_du_bon','fournisseur__designation','date_livraison')
         return JsonResponse(list(commande), safe=False)
 
-
 @login_required(login_url='/login/')
 def ApiUpdateCommande(request):
-    pass
+    if request.method == 'POST':
+        id_commande = request.POST.get('id_commande')
+        new_fournisseur = request.POST.get('new_fournisseur')
+        new_date_date_commande = request.POST.get('new_date_date_commande')
+        new_date_livraison = request.POST.get('new_date_livraison')
+        new_ref_devis = request.POST.get('new_ref_devis')
+        observation = request.POST.get('observation')
+
+        obj = Bons_commande.objects.get(id = id_commande)
+        fournisseur = Fournisseurs.objects.get(id = new_fournisseur)
+
+        obj.fournisseur = fournisseur
+        obj.date_du_bon = new_date_date_commande
+        obj.date_livraison = new_date_livraison
+        obj.ref_devis = new_ref_devis
+        obj.observation = observation
+
+        obj.save()
+        messages.success(request, 'Le bon de commande à été modifier avec succès')
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({
+                "message": message.message,
+                "tags": message.tags,
+            })
+
+        return JsonResponse({'messages': response_messages})
+
+@login_required(login_url='/login/')
+def ApiLoadTotalCommande(request):
+    if request.method == "GET":
+        id_commande = request.GET.get('id_commande')
+        commande = Bons_commande.objects.get(id = id_commande)
+
+        total = Lignes_BonCommande.objects.filter(ref_commande = commande).aggregate(total=Sum('total'))['total']
+
+        if total is None:
+            total = 0
+        
+        return JsonResponse({'total' : total}, safe=False)
+
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
 
