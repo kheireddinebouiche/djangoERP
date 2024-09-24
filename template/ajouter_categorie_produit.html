@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Nouvelle catégorie de produit {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+
+<div class="content-body">
+    <div class="container-fluid">
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Gestion des produits</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Nouvelle catégorie de produit</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+        <div class="row">
+            
+            <div class="col-xl-12 col-lg-12">
+                <div class="card">
+                    
+                    <div class="card-body">
+                        <div class="basic-form">
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <div class="col-md-12">
+                                    <label for="{{ form.label.id_for_label }}">{{ form.label.label }}</label>
+                                    {{ form.label }}
+                                    {{ form.label.errors }}   
+                                </div>
+
+                          
+                                
+                                <button type="submit" class="btn btn-primary mt-3">Confirmer les informations</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

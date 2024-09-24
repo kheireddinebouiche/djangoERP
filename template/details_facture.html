@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block title %} Détails de la facture {% endblock title %}
+
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+
+
+{% block content %}
+
+<style>
+    p{
+        margin-top: 0px;
+        margin-bottom: 0px;
+        margin-left:10px;
+    }
+</style>
+<div class="content-body">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row" style="margin-bottom:50px;">
+                            <h3><b>{{conf.prefix_facture}} - {{obj.number}}</b></h3>
+                            {% if obj.devis %}
+                                <p><b>Réf. commande :</b> {{conf.prefix_devis}}-{{obj.devis}}</p>
+                            {% endif %}
+                                <p><b>Date facture :</b> {{obj.date_facturation}}</p>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-1">
+                            </div>
+                            <div class="col-lg-3">
+                               <h5><b>Fournisseur :</b></h5>
+                               <h5><p><b>{{company.designation}}</b></p></h5>
+                               <!-- <p>Mobile : {{company.mobile}}</p>
+                               <p>N° NIF : {{company.nif}}</p>
+                               <p>N° NIS : {{company.nis}}</p>
+                               <p>N° ART : {{company.art}}</p> 
+                               <p>N° RC : {{company.reg_commerce}}</p>  -->
+                            </div>
+                            <div class="col-lg-4">
+                                <a href="{% url 'commercial:generate_invoice_pdf' invoice_id=obj.id %}">Print</a>
+                            </div>
+                            <div class="col-lg-3">
+                               <h5><b>Client :</b></h5>
+                               <h5><p><b><a href="{% url 'commercial:clientDetails' pk=obj.client.id %}"  title="Afficher les profile du client">{{obj.client}}</a></b></p></h5>
+                               <!-- <p>Mobile : {{obj.client.mobile}}</p>
+                               <p>N° NIF : {{obj.client.nif}}</p>
+                               <p>N° NIS : {{obj.client.nis}}</p>
+                               <p>N° ART : {{obj.client.art}}</p>
+                               <p>N° RC : {{obj.client.reg_commerce}}</p> -->
+
+                            </div>
+                            <div class="col-lg-1">
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped" style="margin-top: 65px;" >
+                                <thead>
+                                    <tr>
+                                        <th>Produit</th>
+                                        <th>Réf.</th>
+                                        <th>Prix HT</th>
+                                        <th>QTY</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items %}
+                                        <tr>
+                                            <td>{{item.produit}}</td>
+                                            <td>{{item.produit.ref}}</td>
+                                            <td><b>{{item.produit.prix_vente}} {{conf.devise}}</b></td>
+                                            <td>{{item.qty}}</td>
+                                            <td><b>{{item.ttc}} {{conf.devise}}</b></td>
+                                        </tr>
+                                    {% endfor %}     
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-sm-5"> </div>
+                            <div class="col-lg-4 col-sm-5 ms-auto">
+                                <table class="table table-clear">
+                                    <tbody>
+                                        <tr>
+                                            <td class="left"><strong>Total HT</strong></td>
+                                            <td class="right">{{montant_ht|floatformat:2}} {{conf.devise}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="left"><strong>Montant TVA</strong></td>
+                                            <td class="right">{{montant_tva|floatformat:2}} {{conf.devise}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="left"><strong>Total</strong></td>
+                                            <td class="right"><strong>{{montant_ttc|floatformat:2}} {{conf.devise}}</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Liste des paiement effectué</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-responsive" >
+                                <thead>
+                                    <tr>
+                                        <th>Réf. paiement</th>
+                                        <th>Montant paiement</th>
+                                        <th>Date paiement</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% if items.count == 0 %}
+                                        {% for item in paiements %}
+                                            <tr>
+                                                <td>{{item.ref_paiement}}</td>
+                                                <td><b>{{item.montant_paiement}} {{conf.devise}}</b></td>
+                                                <td>{{item.date_paiement}}</td>
+                                            
+                                            </tr>
+                                        {% endfor %}     
+                                    {% else %}
+                                            <tr><td colspan="3" style="text-align: center;"><b>Aucun paiement pour cette facture !</b></td></tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

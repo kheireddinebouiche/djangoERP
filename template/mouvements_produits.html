@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% block title %} Mouvement des produits {% endblock title %}
+{% load static %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Stock</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Mouvements des produits</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-responsive" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                       
+                                        <th>Produit/Article</th>
+                                        <th>Référence</th>
+                                        <th>Qty</th>
+                                        <th>Type mouvement</th>
+                                        <th>Crée le</th>
+                                        <th>Actions</th>
+                                    
+                                    </tr>
+                                </thead>
+                                <tbody id="tableListeItem">
+                                   
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="addProductMouvModal" tabindex="-1" aria-labelledby="addProductMouvModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductMouvModalLabel">Ajouter un nouveau mouvement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="addProductForm" action="{% url 'commercial:nouvelle_entree_stock' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="product" class="form-label">Produit/Article</label>
+                        <select class="form-select" id="product" name="product">
+                            {% for p in produits %}
+                            <option value="{{p.id}}">{{p.designation}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="qty" class="form-label">Quantité </label>
+                        <input type="number" class="form-control" id="qty" name="qty" step="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description:</label>
+                        <textarea class="form-control" id="description" name="description"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type_mouvement" class="form-label">Type mouvement :</label>
+                        <select class="form-select" id="type_mouvement" name="type_mouvement">
+                            <option value="ent">Entrée</option>
+                            <option value="sor">Sortie</option>
+                        </select>
+                    </div>
+                    
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" form="addProductForm" class="btn btn-primary">Confirmer le mouvement</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="DetailsProductMouvModal" tabindex="-1" aria-labelledby="DetailsProductMouvModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="DetailsProductMouvModalLabel">Détails du mouvement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body" >
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label for="produtDesignation">Produit/Service</label>
+                        <input type="text" id="produtDesignation" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-lg-6">
+                        <label for="MouvQty">Quantité</label>
+                        <input type="text" id="MouvQty" class="form-control" readonly/>
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="MouvType">Type du mouvement</label>
+                        <input type="text" id="MouvType" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-lg-12">
+                        <label for="MouvDescription">Description</label>
+                       <textarea name="MouvDescription" class="form-control" id="MouvDescription"></textarea>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-lg-6">
+                        <label for="created_by">Crée par</label>
+                        <input type="text" id="created_by" class="form-control" readonly>
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="created_at">Crée le </label>
+                        <input type="text" id="created_at" class="form-control" readonly>
+                    </div>
+                </div>
+            </div>  
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+               
+                <div class="mt-4 text-center" id="deleteModalBody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        loadItem();
+
+        function loadItem(){
+            $.ajax({
+                url : "{% url 'commercial:ApiGetMouvItem' %}",
+                type : "GET",
+                success : function(data){
+                    var row = "";
+                    if(data.length > 0){
+                        $.each(data, function(index, p){
+
+                            row += "<tr>";
+                            row += "<td><b>"+p.produit__designation+"</b></td>";
+                            row += "<td>"+p.produit__ref+"</td>";
+                            
+                            row += "<td style='color:red;'><b>"+p.qty+"</b></td>";
+                            row += "<td><b>" +  (p.type_mouvement == 'sor' ? '<span class="badge light badge-warning"><i class="fa fa-circle text-warning me-1"></i>'+p.type_mouvement_label+'</span>' : 
+
+                            '<span class="badge light badge-info"><i class="fa fa-circle text-info me-1"></i>'+p.type_mouvement_label+'</span>') + "</b></td>" ;
+                            row += "<td>"+p.created_at+"</td>";
+                            row += "<td>";
+                            row += "<button data-id='"+p.id+"' class='btn btn-primary shadow btn-xs sharp me-1' id='profileDetails'><i class='fas fa-pencil-alt'></i></button>";
+                            row += "<button data-id='"+p.id+"' id='showDetailsBtn' class='btn btn-success shadow btn-xs sharp me-1'><i class='fas fa-eye'></i></a>";
+                            row += "<button data-id='"+p.id+"' id='confirmDeleteBtn' class='btn btn-danger shadow btn-xs sharp'><i class='fa fa-trash'></i></a>";
+                            row += "</td>";
+                            row += "</tr>";
+
+                        });
+                    }else{
+                        row += "<tr><td colspan='5'><center><b>Aucun mouvement de produit !</b></td></tr>";
+                    }   
+                    
+
+                    $('#tableListeItem').html(row);
+
+                }
+            });
+        }
+
+
+        $(document).on('click', "#confirmDeleteBtn", function(){
+            var mouvLineId = $(this).data('id');
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer la ligne</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion de cette ligne, supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+mouvLineId+"' id='approveDelete'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+            $('#deleteRecordModal').modal('show');
+
+        });
+
+        $(document).on('click', '#approveDelete', function(){
+        var mouvLineId = $(this).data('id');
+
+            $.ajax({
+                url : "{% url 'commercial:DeleteMouvementLine' %}",
+                type : 'GET',
+                data : {
+                    'mouvLineId' : mouvLineId
+                },
+                success : function(response){
+
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadItem();
+                    $('#deleteRecordModal').modal('hide');
+                }
+            });
+        });
+        
+        $(document).on('click', '#showDetailsBtn', function(){
+            var id_ligne_mouv = $(this).data('id');
+
+            $.ajax({
+                url : "{% url 'commercial:ApiDetailsMouvement' %}",
+                type : "GET",
+                data : {
+                    'id_ligne_mouv' : id_ligne_mouv,
+                },
+                success : function(data){
+                    var d = data;
+
+                    $('#produtDesignation').val(d.produit_designation);
+                    $('#MouvQty').val(d.qty);
+                    $('#MouvType').val(d.type_mouvement_label);
+                    $('#MouvDescription').val(d.description);
+                    $('#created_at').val(d.created_at);
+                    $('#created_by').val(d.user);
+
+                    $('#DetailsProductMouvModal').modal('show');
+
+                }
+            });
+        });
+        
+    });
+</script>
+{% endblock content %}

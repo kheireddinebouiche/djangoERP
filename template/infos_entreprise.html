@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %} Informations de mon entreprise {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Configuration</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Configurer mon entreprise</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+       
+        <div class="row">
+            <div class="col-12">
+
+                <form method="POST">
+                    <div class="card">
+                        
+                        <div class="card-body">
+                            
+                    
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <label for="designation">Raison social</label>
+                                    {{form.designation}}
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-lg-4">
+                                    <label>N° d'identification fiscal</label>
+                                    {{form.nif}}
+                                </div>
+                                <div class="col-lg-4">
+                                    <label>N° d'identification statistique</label>
+                                    {{form.nis}}
+                                </div>
+                                <div class="col-lg-4">
+                                    <label>N° Article</label>
+                                    {{form.art}}
+                                </div>                        
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-lg-4">
+                                    <label>N° Téléphone</label>
+                                    {{form.mobile}}
+                                </div>
+                                <div class="col-lg-4">
+                                    <label>N° FAX</label>
+                                    {{form.fax}}
+                                </div>
+                                <div class="col-lg-4">
+                                    <label>Email</label>
+                                    {{form.email}}
+                                </div>                        
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-lg-12">
+                                    <label>Adresse</label>
+                                    {{form.adresse}}
+                                </div>            
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-lg-12">
+                                    <label>N° registre commerce</label>
+                                    {{form.reg_commerce}}
+                                </div>            
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Confirmer les informations</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block title %} Liste des factures {% endblock title %}
+
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+
+{% block content %}
+
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Ventes</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Liste des factures</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+    
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="devisListe" class="table table-responsive-md" style="min-width: 845px">
+                                <thead>
+                                    <tr>
+                                        <th>N°</th>
+                                        <th>Client</th>
+                                        <th>Date facturation</th>
+                                        <th>Date de création</th>
+                                        <th>Etat</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="FactureListeTableBody">
+
+                                  
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+               
+                <div class="mt-4 text-center" id="deleteModalBody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function(){
+
+        loadFactureItem();
+
+        function loadFactureItem(){
+            $.ajax({
+                url : '{% url "commercial:liste_Facture" %}',
+                type : "GET",
+                success : function(data){
+                   if(data.length > 0){
+                    var row = "";
+                    $.each(data, function(index,p){
+                        
+                        row += "<tr>";
+                    
+                        row += "<td><b>" + p.number + "</b></td>";
+                        row += "<td><b>" + p.client__designation + "</b></td>";
+                        row += "<td><b>" + p.date_facturation + "</b></td>";
+                        row += "<td><b>" + p.created_at + "</b></td>";
+                        row += "<td><b>" +  (p.etat == "bro" ? '<span class="badge light badge-warning"><i class="fa fa-circle text-warning me-1"></i>'+p.etat_label+'</span>' : 
+                                            p.etat == "ann" ? '<span class="badge light badge-danger"><i class="fa fa-circle text-danger me-1"></i>'+p.etat_label+'</span>' : 
+                                            p.etat == "fac" ? '<span class="badge light badge-success"><i class="fa fa-circle text-success me-1"></i>'+p.etat_label+'</span>' : 
+                                            '<span class="badge light badge-dark"><i class="fa fa-circle text-dark me-1"></i>'+p.etat_label+'</span>') + "</b></td>" ;
+                        row += "<td><div class='d-flex'>";
+                        row += "<a " + (p.etat == 'ter' ? 'hidden' : '' ) + " href='/ventes/factures/configuration-facture/"+p.id+"' class='btn btn-warning shadow btn-xs sharp me-1' id='profileDetails'><i class='fas fa-pencil-alt'></i></a>";
+                        row += "<a href='/ventes/factures/details-facture/"+p.id+"' class='btn btn-success shadow btn-xs sharp me-1' id='profileDetails'><i class='fas fa-eye'></i></a>";
+                        row += "<button " + (p.etat == "ter" ? 'hidden' : '') + " data-id='"+p.id+"' id='confirmuserDeleteBtn' class='btn btn-danger shadow btn-xs sharp me-1'><i class='fa fa-trash'></i></button>";
+                        row += "<a target='_blank' href='/invoice/"+p.id+"/pdf/' " + (p.etat == "bro" ? 'hidden' : '') + " data-id='" + p.id + "' id='printInvoice' class='btn btn-dark shadow btn-xs sharp'><i class='fa-solid fa-file-pdf'></i></a>";
+
+                        row += "</div>";											
+                        row += "</td>";
+                        row += "</tr>";
+                    });
+
+                    $('#FactureListeTableBody').html(row);
+                   }else{
+
+                    row += "<tr>";
+                    row += "<td colspan='6' style='text-align:center;'><b>Aucune facture crée !</b></td>";
+                    row += "</tr>";
+                    $('#FactureListeTableBody').html(row);
+
+                   }
+                    
+                    
+                }
+            });
+
+
+        }
+    
+        $(document).on('click', '#confirmuserDeleteBtn', function(){
+            var id_lign = $(this).data('id');
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer une facture</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion de la facture supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+id_lign+"' id='factureDeleteBtn'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+
+            $('#deleteRecordModal').modal('show');
+
+        });
+        
+        $(document).on('click', '#factureDeleteBtn', function(){
+            var id_lign = $(this).data('id');
+
+            $.ajax({
+                url :'{% url "commercial:deleteFacture" %}',
+                type : 'GET',
+                data : {
+                    'id_lign' : id_lign,
+                },
+                success : function(response){
+                    // Déclencher les notifications alertify pour chaque message
+                    alertify.set('notifier', 'position', 'top-right');
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+
+                    loadFactureItem();
+                    $('#deleteRecordModal').modal('hide');
+                }
+            });
+        }); 
+    });
+</script>
+
+{% endblock content %}

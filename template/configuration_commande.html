@@ -1,0 +1,598 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Configuration de la facture {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% block content %}
+
+<style>
+    .btn{
+        padding: 5px 5px 5px 5px; 
+        font-size: 14px;
+        width: 140px;
+        font-weight: 700;
+    }
+</style>
+
+<div class="content-body">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+
+                            <div class="col-lg-4">
+                                <label for="id_commande">N° Commande</label>
+                                <input hidden readonly ="text" class="form-control" id="number_commande" value="{{obj.number}}">
+                                <input hidden readonly ="text" class="form-control" id="id_commande" value="{{obj.id}}">
+                                <p><b>{{obj.number}}</b></p>
+                            </div>
+                            <div class="col-lg-4">
+                                <label>Date de la commande</label>
+                                <input hidden readonly ="text" class="form-control" id="date_du_bon" value="{{obj.date_du_bon}}">
+                                <p><b>{{obj.date_du_bon}}</b></p>
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="devis_user">Utilisateur</label>
+                                <input hidden readonly ="text" class="form-control" id="devis_user" value="{{obj.user}}">
+                                <p><b>{{obj.user}}</b></p>
+                            </div>
+                            
+                        </div>
+
+                        <div class="row mt-2">
+                            {% if obj.ref_devis %}
+                            <div class="col-lg-3">
+                                <label>Réf. devis</label>
+                                <p><b>{{obj.ref_devis}}</b></p>
+                            </div>
+                            {% endif %}
+                            <div class="col-lg-3">
+                                <label>Fournisseur</label>
+                                <p><b>{{obj.fournisseur}}</b></p>
+                            </div>
+                            <div class="col-lg-3">
+                                <label>Etat </label>
+                                <p><b>{{obj.get_etat_display}}</b></p>
+                            </div>
+                            <div class="col-lg-3">
+                                <label>Date de livraison</label>
+                               <p><b>{{obj.date_livraison}}</b></p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="row mt-3">
+                                <div class="col-lg-12">
+                                    {% if obj.etat == "bro" %}
+                                        <button data-id="{{obj.id}}" id="validateBtn" class="btn btn-primary"> Valider </button>
+                                        <button data-id="{{obj.id}}" type="button" id="updateCommandeDetailsBtn" class="btn btn-success"> Modifier </button>
+                                    {% endif %}
+                                    {% if obj.etat == "fac" %}
+                                        <a href="" class="btn btn-primary"> Brouillon </a>
+                                    {% endif %}
+                                    {% if request.user.is_staff %}
+                                        <button data-id="{{obj.id}}" id="BtnDeleteBonCommande" class="btn btn-danger"> Supprimer </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-lg-12">
+                            <label for="observation"> Observations </label>
+                            <textarea name="observation" class="form-control" id="observation">{{obj.observation}}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">     
+            <div class="col-8">
+                <div class="card">
+                    <div class="card-header">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AjoutDuProduitCommande">
+                           Ajouter
+                          </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="lignesCaisseTable" class="table table-responsive-md" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>Produit/Article</th>
+                                        <th>Prix d'achat </th>
+                                        <th>Qty</th>
+                                        <th>Total</th>
+                                        <th>Actions</th>  
+                                    </tr>
+                                </thead>
+                                <tbody id="CommandeLignItems">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card">   
+                    <div class="card-body">
+                        <div class="row">
+                            <label for="montant_ht">Montant Total :</label>
+                            <input readonly  type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_total" >
+                             </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="AjoutDuProduitCommande" tabindex="-1" aria-labelledby="AjoutDuProduitCommandeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="AjoutDuProduitCommandeLabel">Formulaire d'ajout de produit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form method="POST">
+                    
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <label for="product"><b>Produit</b></label>
+                            <select class="form-control" id="product" name="product">
+                                
+                            </select>
+                        </div>
+                        <div class="col-lg-4">
+                            <button style="margin-top: 40px;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddNewProd">Créer</button>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="qty"><b>Quantité </b></label>
+                            <input type="number" id="qty" name="qty" class="form-control" require step="1">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="tva"><b>TVA </b></label>
+                            <select class="form-control" id="tva" name="tva">
+                                {% for e in tva %}
+                                    <option value="{{e.id}}">{{e.taux}} %</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>   
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="addNewProduct">Ajouter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="AddNewProd" tabindex="-1" aria-labelledby="AddNewProdLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddNewProdLabel">Nouveau produit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                
+              <label for="new_product_add">Désignation du produit</label>
+              <input type="text" class="form-control" id="new_product_add">
+              
+              <label for="new_ref_add">Référence</label>
+              <input type="text" class="form-control" id="new_ref_add">
+
+              <label for="new_type_produit">Type produit</label>
+              <select name="new_type_produit" class="form-control" id="new_type_produit">
+                <option value="pro">Produit</option>
+                <option value="srv">Service</option>
+              </select>
+
+              <label for="new_prix_achat">Prix de vente</label>
+              <input type="number" class="form-control" id="new_prix_achat" step="0.1">
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-warning" id="addNewProductToDataBase">Ajouter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="updateCommandeDetailsModal" tabindex="-1" aria-labelledby="updateCommandeDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateCommandeDetailsModalLabel">Modification des informations de la commande</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form method="POST">
+                    
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <label for="new_fournisseur"><b>Client</b></label>
+                            <select class="form-control" name="new_fournisseur" id="new_fournisseur">
+                                <option>-----------------------</option>
+                                {% for c in fournisseur %}
+                                    <option value="{{c.id}}" {% if obj.fournisseur.id == c.id %} selected {% endif %}>{{c.designation}} </option>
+                                {% endfor %} 
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-12">
+                            <label for="new_date_date_commande"><b>Date de la commande</b></label>
+                            <input type="date" class="form-control" id="new_date_date_commande" name="new_date_date_commande" value="{{ obj.date_du_bon|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-6">
+                            <label for="new_date_livraison"><b>Date de livraison </b></label>
+                            <input type="date" class="form-control" id="new_date_livraison" name="new_date_livraison" value="{{ obj.date_livraison|date:'Y-m-d' }}">
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="new_ref_devis"><b>Référence du devis </b></label>
+                            <input type="text" class="form-control" id="new_ref_devis" name="new_ref_devis" value="{{ obj.ref_devis }}">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <label for="oservation"><b>Observation</b></label>
+                        <textarea type="date" class="form-control" id="observation" name="observation" >{{obj.observation}}</textarea>
+
+                    </div>   
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="submit" class="btn btn-warning" id="confirmUpdateCommande">Modifier</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
+            </div>
+            <div class="modal-body p-5 text-center">
+               
+                <div class="mt-4 text-center" id="deleteModalBody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+
+        loadProducts();
+        loadCommandeItem();
+        loadTotalCommande();
+
+        function loadTotalCommande(){
+            var id_commande = document.getElementById('id_commande').value;
+            $.ajax({
+                url : "{% url 'commercial:ApiLoadTotalCommande' %}",
+                type: 'GET',
+                data : {
+                    'id_commande' : id_commande,
+                },
+                success: function(data){
+                    
+                    $('#montant_total').val(parseFloat(data.total).toFixed(2) +" {{conf.devise}}");
+                },
+            });
+        }
+             
+        function loadCommandeItem(){
+            var id_commande = document.getElementById('id_commande').value;
+            $.ajax({
+                url : "{% url 'commercial:ApiFetchCommandeItem' %}",
+                type : "GET",
+                data : {
+                    'id_commande' : id_commande
+                },
+                success : function(data){
+                    if (data.length > 0){
+                        var devisBody = $('#CommandeLignItems');
+                        devisBody.empty();
+
+                        $.each(data, function(index, p){
+
+                            var row = "<tr>";
+                                row +="<td>"+p.produit__designation+"</td>";
+                                row +="<td>"+p.produit__prix_achat+" {{conf.devise}}</td>";
+                                row +="<td><b><button data-id='"+p.id+"' style='margin-right:3px;border:none; background : transparent;' type='button' id='MinusBtn'>-</button>"+p.qty+"<button data-id='"+p.id+"' style='margin-left:3px;border:none; background : transparent;' type='button' id='PlusBtn'>+</button></b></td>";
+                                row +="<td><b>"+p.total+" {{conf.devise}}</b></td>";
+                                row += "<td><button class='btn btn-danger shadow btn-xs sharp me-1' id='deleteBtn' data-id='"+ p.id +"' '><i class='fa fa-trash'></i></button></td>";
+                                row +="</tr>";
+                                devisBody.append(row);
+                        });
+                                                
+                    }else{
+                        var row = "<tr><td colspan='5'><center><b>Veuillez ajouter des produits/Articles</b></center></td></tr>"; 
+                    }
+                    $('#CommandeLignItems').html(row);
+                }
+            });
+        }
+
+        function loadProducts(){
+            $.ajax({
+                url : "{% url 'commercial:ApiGetProducts' %}",
+                type : 'GET',
+                success : function(data){
+                    var p = data[0];
+                    var row = "";
+                    $.each(data, function(index, p){
+                        row += "<option value='"+p.id+"'>"+p.designation+"</option>";
+                    });
+                    $('#product').html(row);
+                }
+            });
+        }
+    
+        $(document).on('click', '#addNewProduct', function(){
+            var produit = document.getElementById('product').value;
+            var qty = document.getElementById('qty').value;
+            var taux = document.getElementById('tva').value;
+            var id_commande = document.getElementById('id_commande').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiAddCommandeLine' %}",
+                type : 'POST',
+                data : {
+                    'produit' : produit,
+                    'qty' : qty,
+                    'id_commande' : id_commande,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadCommandeItem();
+                    loadTotalCommande();
+                    $('#AjoutDuProduitCommande').modal('hide');
+                },
+            });
+
+        });   
+        
+        $(document).on('click', '#addNewProductToDataBase', function(){
+
+            var new_product_add  = document.getElementById('new_product_add').value;
+            var new_ref_add = document.getElementById('new_ref_add').value;
+            var new_type_produit = document.getElementById('new_type_produit').value;
+            var new_prix_achat = document.getElementById('new_prix_achat').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiConfirmAddNewProduct' %}",
+                type: 'POST',
+                data : {
+                    'new_product_add' : new_product_add,
+                    'new_ref_add' : new_ref_add,
+                    'new_type_produit' : new_type_produit,
+                    'new_prix_achat' : new_prix_achat,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadProducts();
+                    $('#AddNewProd').modal('hide');
+                    $('#AjoutDuProduitCommande').modal('show');
+                }
+            }); 
+
+           
+        });
+        
+        $(document).on('click', '#deleteBtn', function(){
+            var id_ligne_commande = $(this).data('id');
+
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer le produit de la commande</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion ce cette ligne supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+id_ligne_commande+"' id='confirmDeleteBtn'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+            $('#deleteRecordModal').modal('show');
+            
+        });
+        
+        $(document).on('click','#confirmDeleteBtn', function(){
+            var id_ligne_commande = $(this).data('id');
+
+            $.ajax({
+                url : '{% url "commercial:ApiDeleteLigneCommande" %}',
+                type : 'GET',
+                data : {
+                    'id_ligne_commande' : id_ligne_commande,
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadCommandeItem();
+                    loadTotalCommande();
+                    $('#deleteRecordModal').modal('hide');
+                },
+            });
+        });
+    
+        $(document).on('click', '#BtnDeleteBonCommande', function(){
+            var id_commande = $(this).data('id');
+
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer le bon de commande</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion ce bon de commande supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+id_commande+"' id='confirmDeleteBtnCommande'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+            $('#deleteRecordModal').modal('show');
+        });
+
+        $(document).on('click','#confirmDeleteBtnCommande', function(){
+            var id_commande = $(this).data('id');
+            console.log(id_commande);
+
+            $.ajax({
+                url : "{% url 'commercial:ApiDeleteBonCommande' %}",
+                data : {'id_bon_commande' : id_commande},
+                type : 'GET',
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadCommandeItem();
+                    $('#deleteRecordModal').modal('hide');
+                    window.location.href= "{% url 'commercial:PageListeCommande' %}";
+                },
+            });
+        });
+        
+        $(document).on('click', '#updateCommandeDetailsBtn', function(){
+            $('#updateCommandeDetailsModal').modal('show');
+        });
+
+        $(document).on('click','#confirmUpdateCommande', function(){
+            var id_commande = document.getElementById('id_commande').value;
+            var new_fournisseur = document.getElementById('new_fournisseur').value;
+            var new_date_date_commande = document.getElementById('new_date_date_commande').value;
+            var new_date_livraison = document.getElementById('new_date_livraison').value;
+            var new_ref_devis = document.getElementById('new_ref_devis').value;
+            var observation = document.getElementById('observation').value;
+
+            $.ajax({
+                url : '{% url "commercial:ApiUpdateCommande" %}',
+                type : 'POST',
+                data : {
+                    'id_commande': id_commande,
+                    'new_fournisseur': new_fournisseur,
+                    'new_date_date_commande': new_date_date_commande,
+                    'new_date_livraison': new_date_livraison,
+                    'new_ref_devis': new_ref_devis,
+                    'observation': observation,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+
+                    setTimeout(function() {
+                            window.location.reload();
+                        }, 900);
+                }
+                
+            });
+
+
+        });
+        
+        $(document).on('click','#MinusBtn', function(){
+            var id_ligne_commande = $(this).data('id');
+            var action = "minus";
+
+            $.ajax({
+                url : "{% url 'commercial:ApiUpdateQty'  %}",
+                type: 'GET',
+                data : {
+                    'id_ligne_commande' : id_ligne_commande,
+                    'action' : action,
+                },
+                success : function(response){
+
+                },
+            });
+        });
+        $(document).on('click','#PlusBtn', function(){
+            var id_ligne_commande = $(this).data('id');
+            var action = "plus";
+
+            $.ajax({
+                url : "{% url 'commercial:ApiUpdateQty'  %}",
+                type: 'GET',
+                data : {
+                    'id_ligne_commande' : id_ligne_commande,
+                    'action' : action,
+                },
+                success : function(response){
+
+                },
+            });
+        });
+
+
+    });
+</script>
+
+
+{% endblock content %}

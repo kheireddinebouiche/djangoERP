@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %} Liste des produits vendus {% endblock title %}
+{% load static %}
+{% block sidebarre %} {% include 'pos-sidebarre.html' %} {% endblock sidebarre %}
+{% block content %}
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Point de vente</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Liste des ventes</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                   
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="example3" class="display" style="min-width: 845px">
+                                <thead>
+                                    <tr>
+                                        <th>Produit/Article</th>
+                                        <th>Réf. Produit</th>
+                                        <th>Prix de vente</th>
+                                        <th>Quantité</th>
+                                        <th>Total</th>
+                                        <th>Date de vente</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for e in liste %}
+                                        <tr>
+                                            
+                                            <td>{{e.product.designation}}</td>
+                                            <td>{{e.product.ref}}</td>
+                                            <td><b>{{e.prix_vente}} {{config.devise}}</b></td>
+                                            <td>{{e.qty}}</td>
+                                            <td><b style="color:red;">{{e.montant_total}} {{config.devise}}</b></td>
+                                            <td>{{e.created_at}}</td>
+                                            <td>
+                                                <div class="d-flex">
+                                                    <a href="{% url 'commercial:client_update' pk=e.id %}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
+                                                    <a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+                                                </div>												
+                                            </td>												
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

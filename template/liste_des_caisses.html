@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %} Liste des caisses {% endblock title %}
+{% load static %}
+{% block sidebarre %} {% include 'pos-sidebarre.html' %} {% endblock sidebarre %}
+
+{% block content %}
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Point de vente</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Historique des caisses</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                   
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="example3" class="display" style="min-width: 845px">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Utilisateur</th>
+                                        <th>Nbr ventes</th>
+                                        <th>Montant TOTAL</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for e in nb_vente %}
+                                        <tr>
+                                            <td><b>{{e.caisse.num}}</b></td>
+                                            <td>{{e.caisse.created_at}}</td>
+                                            {% if e.caisse.etat == "1" %}
+                                                <td><span class="badge light badge-success" >En cours</span></td>
+                                            {% elif e.caisse.etat == "0" %}
+                                                <td><span class="badge light badge-danger" >Terminer</span></td>
+                                            {% endif %}
+                                            <td>{{e.caisse.user.username}}</td>
+                                            <td><b>{{e.nombre_vente }}</b></td>
+                                            <td><b>{{e.montant_total|floatformat:2}} {{config.devise}}</b></td>
+                                            <td>
+                                                <div class="d-flex">
+                                                    <a href="#" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
+                                                    <button type="button" id="detailsBtn" class="btn btn-info shadow btn-xs sharp me-1" data-id="{{e.caisse.num}}"><i class="fas fa-eye"></i></button>
+                                                    <a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+                                                </div>												
+                                            </td>												
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="ListeDesSessionVente" tabindex="-1" aria-labelledby="ListeDesSessionVenteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="ListeDesSessionVenteLabel">Liste des ventes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body" >
+                <div class="table-responsive">
+                    <table id="lignesCaisseTable" class="table table-responsive-md" style="min-width: 100%">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Crée le </th>
+                                <th>Utilisateur</th>
+                                <th>Total</th>
+                                <th>Actions</th>  
+                            </tr>
+                        </thead>
+                        <tbody id="detail_de_la_caisse">
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function(){
+
+        $(document).on('click', '#detailsBtn', function(){
+            var id_caisse = $(this).data('id');
+            
+            $.ajax({
+                url : "{% url 'commercial:liste_session_caisse' %}",
+                type : "GET",
+                data : {'id_caisse':id_caisse},
+                success : function(data){
+                    
+                    $.each(data, function(index, p) {
+                        var row = "<tr>";
+                        row += "<td><b>" + p.num + "</b></td>";
+                        row += "<td><b>" + p.created_at + "</b></td>";
+                        row += "<td><b>" + p.user__username + "</b></td>";
+                        row += "<td><b style='color:red;'>" + parseFloat(p.montant_total).toFixed(2) + " {{config.devise}}</b></td>";
+                        row += "<td><button class='btn btn-primary shadow btn-xs sharp me-1' id='detailsBtn' data-id='"+ p.num +"' '><i class='fa fa-eye'></i></button></td>";
+                        row += "</tr>";
+                        $('#detail_de_la_caisse').append(row);
+                    });
+
+                    
+
+                    $('#ListeDesSessionVente').modal('show');
+                }
+
+            });
+        });
+    });
+</script>
+
+{% endblock content %}

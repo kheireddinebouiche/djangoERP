@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %} Liste des produits par catégorie {% endblock title %}
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+
+{% block content %}
+
+<div class="content-body">
+    <div class="container-fluid">
+        
+        <div class="row page-titles">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active"><a href="javascript:void(0)">Gestion des produits</a></li>
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Produits par catégorie</a></li>
+            </ol>
+        </div>
+        <!-- row -->
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table  class="table table-striped" style="min-width: 100%">
+                                <thead>
+                                    <tr>
+                                       
+                                        <th>Désignation de la catégorie</th>
+                                        <th>Nbr. produit</th>
+                                        <th>Actions</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    {% for e in categories %}
+                                        <tr>
+                                            
+                                            <td>{{e.label}}</td>
+                                            <td><strong>{{e.nombre_produits}}</strong></td>
+                                            <td>
+                                                <div class="d-flex">
+                                                    
+                                                    <button type="button" data-id="{{e.id}}" id="contenuDesCategorie" title="Afficher les produits de la catégorie de produit" data-bs-toggle="modal" data-bs-target="#contenuDesCategorieModal" class="btn btn-primary shadow btn-xs sharp me-1" >
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                </div>												
+                                            </td>												
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="contenuDesCategorieModal" tabindex="-1" aria-labelledby="contenuDesCategorieModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="contenuDesCategorieModalLabel">Liste des produits de la catégories</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <th>Désignation</th>
+                            <th>Référence</th>
+                            <th>Code à barre</th>
+                        </thead>
+                        <tbody id="tableListe">
+
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function(){
+
+        $(document).on('click', '#contenuDesCategorie', function(){
+            var id_cat = $(this).data('id');
+            $.ajax({
+                url : '{% url "commercial:ApiFetchProductCat" %}',
+                data : {
+                    'id_cat' : id_cat,
+                },
+                type : 'GET',
+                success : function(data){
+                    var row = "";
+                    $.each(data, function(index, p){
+                        row += "<tr>";
+                        row += "<td>"+p.designation+"</td>";
+                        row += "<td>"+p.ref+"</td>";
+                        row += "<td>"+p.code_barre+"</td>";
+                        row += "</tr>";
+                    });
+                    $('#tableListe').html(row);
+                    
+                },
+            });
+        });
+    });
+</script>
+
+{% endblock content %}
