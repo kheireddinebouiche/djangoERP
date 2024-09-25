@@ -182,6 +182,8 @@ urlpatterns = [
     path('ApiUpdateCommande',ApiUpdateCommande,name="ApiUpdateCommande"),
     path('ApiLoadTotalCommande',ApiLoadTotalCommande,name="ApiLoadTotalCommande"),
     path('ApiUpdateQty', ApiUpdateQty, name="ApiUpdateQty"),
+    path('ApiValidateBonCommande', ApiValidateBonCommande, name="ApiValidateBonCommande"),
+    path('ApiMakeCommandeBrouillon', ApiMakeCommandeBrouillon, name="ApiMakeCommandeBrouillon"),
     ################### GESTION DES COMMANDES #############################################################
 
 ]

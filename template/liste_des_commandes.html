@@ -29,6 +29,7 @@
                                         <th>N°</th>
                                         <th>Fournisseur</th>
                                         <th>Date du bon</th>
+                                        <th>Etat</th>
                                         <th>Crée le</th>
                                         <th>Actions</th>
                                         
@@ -80,6 +81,10 @@
                             row += "<td><b>"+p.number+"</b></td>";
                             row += "<td>"+p.fournisseur__designation+"</td>";
                             row += "<td>"+p.date_du_bon+"</td>";
+                            row += "<td>"+(p.etat == "bro" ? '<span class="badge light badge-warning"><i class="fa fa-circle text-warning me-1"></i>'+p.etat_label+'</span>' : 
+                                            p.etat == "ann" ? '<span class="badge light badge-danger"><i class="fa fa-circle text-danger me-1"></i>'+p.etat_label+'</span>' : 
+                                            p.etat == "val" ? '<span class="badge light badge-success"><i class="fa fa-circle text-success me-1"></i>'+p.etat_label+'</span>' : 
+                                            '<span class="badge light badge-dark"><i class="fa fa-circle text-dark me-1"></i>'+p.etat_label+'</span>')+"</td>";
                             row += "<td>"+p.created_at+"</td>";
                             row += "<td>";
                             row += "<a href='/achat/bons-de-commandes/configuration/"+p.id+"' class='btn btn-warning shadow btn-xs sharp me-1' id='editBTN'><i class='fas fa-pencil'></i></a>";

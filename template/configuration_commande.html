@@ -69,8 +69,8 @@
                                         <button data-id="{{obj.id}}" id="validateBtn" class="btn btn-primary"> Valider </button>
                                         <button data-id="{{obj.id}}" type="button" id="updateCommandeDetailsBtn" class="btn btn-success"> Modifier </button>
                                     {% endif %}
-                                    {% if obj.etat == "fac" %}
-                                        <a href="" class="btn btn-primary"> Brouillon </a>
+                                    {% if obj.etat == "val" %}
+                                        <button id="brouillonBtn"  data-id="{{obj.id}}" class="btn btn-primary"> Brouillon </button>
                                     {% endif %}
                                     {% if request.user.is_staff %}
                                         <button data-id="{{obj.id}}" id="BtnDeleteBonCommande" class="btn btn-danger"> Supprimer </button>
@@ -569,10 +569,20 @@
                     'action' : action,
                 },
                 success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadCommandeItem();
+                    loadTotalCommande();
 
                 },
             });
         });
+        
         $(document).on('click','#PlusBtn', function(){
             var id_ligne_commande = $(this).data('id');
             var action = "plus";
@@ -585,12 +595,69 @@
                     'action' : action,
                 },
                 success : function(response){
-
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadCommandeItem();
+                    loadTotalCommande();
                 },
             });
         });
 
+        $(document).on('click', '#validateBtn', function(){
+            var id_commande = $(this).data('id');
 
+            $.ajax({
+                url : "{% url 'commercial:ApiValidateBonCommande' %}",
+                type : 'GET',
+                data : {
+                    'id_commande' : id_commande,
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+
+                    setTimeout(function() {
+                            window.location.href= "{% url 'commercial:PageListeCommande' %}";
+                    }, 900);
+                    
+                }
+            });
+        });
+
+        $(document).on('click','#brouillonBtn', function(){
+            var id_commande = $(this).data('id');
+
+            $.ajax({
+                url : "{% url 'commercial:ApiMakeCommandeBrouillon' %}",
+                type : 'GET',
+                data : {
+                    'id_commande' : id_commande,
+                },
+                success : function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    setTimeout(function() {
+                            window.location.reload();
+                    }, 900);
+                    
+                }
+            }); 
+        });
     });
 </script>
 
