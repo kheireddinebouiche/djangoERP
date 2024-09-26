@@ -88,14 +88,14 @@
                         row += "<td><b>" + p.date_facturation + "</b></td>";
                         row += "<td><b>" + p.created_at + "</b></td>";
                         row += "<td><b>" +  (p.etat == "bro" ? '<span class="badge light badge-warning"><i class="fa fa-circle text-warning me-1"></i>'+p.etat_label+'</span>' : 
-                                            p.etat == "ann" ? '<span class="badge light badge-danger"><i class="fa fa-circle text-danger me-1"></i>'+p.etat_label+'</span>' : 
-                                            p.etat == "fac" ? '<span class="badge light badge-success"><i class="fa fa-circle text-success me-1"></i>'+p.etat_label+'</span>' : 
+                                            p.etat == "val" ? '<span class="badge light badge-success"><i class="fa fa-circle text-success me-1"></i>'+p.etat_label+'</span>' : 
+                                            p.etat == "ter" ? '<span class="badge light badge-dark"><i class="fa fa-circle text-dark me-1"></i>'+p.etat_label+'</span>' : 
                                             '<span class="badge light badge-dark"><i class="fa fa-circle text-dark me-1"></i>'+p.etat_label+'</span>') + "</b></td>" ;
                         row += "<td><div class='d-flex'>";
                         row += "<a " + (p.etat == 'ter' ? 'hidden' : '' ) + " href='/ventes/factures/configuration-facture/"+p.id+"' class='btn btn-warning shadow btn-xs sharp me-1' id='profileDetails'><i class='fas fa-pencil-alt'></i></a>";
                         row += "<a href='/ventes/factures/details-facture/"+p.id+"' class='btn btn-success shadow btn-xs sharp me-1' id='profileDetails'><i class='fas fa-eye'></i></a>";
-                        row += "<button " + (p.etat == "ter" ? 'hidden' : '') + " data-id='"+p.id+"' id='confirmuserDeleteBtn' class='btn btn-danger shadow btn-xs sharp me-1'><i class='fa fa-trash'></i></button>";
-                        row += "<a target='_blank' href='/invoice/"+p.id+"/pdf/' " + (p.etat == "bro" ? 'hidden' : '') + " data-id='" + p.id + "' id='printInvoice' class='btn btn-dark shadow btn-xs sharp'><i class='fa-solid fa-file-pdf'></i></a>";
+                        row += "<button " + (p.etat == "ter" | p.etat == "val" ? 'hidden' : '') + " data-id='"+p.id+"' id='confirmuserDeleteBtn' class='btn btn-danger shadow btn-xs sharp me-1'><i class='fa fa-trash'></i></button>";
+                        row += "<a target='_blank' href='/invoice/"+p.id+"/pdf/' " + (p.etat == "bro"  ? 'hidden' : '') + " data-id='" + p.id + "' id='printInvoice' class='btn btn-dark shadow btn-xs sharp'><i class='fa-solid fa-file-pdf'></i></a>";
 
                         row += "</div>";											
                         row += "</td>";

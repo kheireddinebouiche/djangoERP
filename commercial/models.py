@@ -445,6 +445,7 @@ class Facture(models.Model):
 
     ETAT_DEVIS = {
         ('bro', "Brouillon"),
+        ('val', "Valider"),
         ('ter', "Terminer"),
     }
     DELAI_PAIE = {

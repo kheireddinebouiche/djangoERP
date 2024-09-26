@@ -834,7 +834,7 @@ def valideInvoice(request):
         id_facture = request.GET.get('id_facture')
         obj = Facture.objects.get(id = id_facture)
 
-        obj.etat = "ter"
+        obj.etat = "val"
         obj.save()
 
         ligne_facture = Ligne_Facture.objects.filter(facture = obj)
@@ -851,7 +851,7 @@ def valideInvoice(request):
             new_mouvement.save()
 
         messages.success(request, "La facture à été validé ")
-        # Extraire les messages
+       
         response_messages = []
         for message in messages.get_messages(request):
             response_messages.append({

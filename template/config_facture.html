@@ -75,8 +75,13 @@
                                         <button data-id="{{obj.id}}" id="validateBtn" class="btn btn-primary"> Valider </button>
                                         <button data-id="{{obj.id}}" type="button" id="updateFactureBtn" class="btn btn-success"> Modifier </button>
                                     {% endif %}
-                                    {% if obj.etat == "fac" %}
+                                    {% if obj.etat == "val" %}
                                         <a href="{% url 'commercial:makeDevisBrouillon' pk=obj.id %}" class="btn btn-primary"> Brouillon </a>
+
+                                        {% if obj.is_delivred == "0" %}
+                                            <a href="{% url 'commercial:makeDevisBrouillon' pk=obj.id %}" class="btn btn-warning"> Livrer </a>
+                                        {% endif %}
+
                                     {% endif %}
                                     {% if request.user.is_staff %}
                                         <a href="" class="btn btn-danger"> Supprimer </a>
@@ -275,9 +280,6 @@
        
         loadFactureItem()
 
-        if (montant_facture  == 0){
-            $('#validateBtn').prop('disabled', true);
-        }
 
         $(document).on('click', '#addNewProduct', function(){
             var produit = document.getElementById('product').value;
@@ -372,7 +374,7 @@
                     $('#montant_ttc').val(parseFloat(response.montant_ttc).toFixed(2)+' '+'{{conf.devise}}');
                     $('#montant_tva').val(parseFloat(response.montant_tva).toFixed(2)+' '+'{{conf.devise}}');
                     
-                    if (montant_facture  == 0){
+                    if (response.montant_facture  == 0){
                         $('#validateBtn').prop('disabled', true);
                     }
                                 
@@ -406,7 +408,7 @@
                                     alertify.error(message.message);
                                 }
                             });
-                            window.location.href = '{% url "commercial:detailFacture" pk=0 %}'.replace('0', id_facture)
+                            // window.location.href = '{% url "commercial:detailFacture" pk=0 %}'.replace('0', id_facture)
                         },
                     });
 
