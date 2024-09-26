@@ -24,15 +24,20 @@
                                 {% csrf_token %}
 
                                 <div class="row">
-                                    <div class="col-md-8">
+                                    <div class="col-md-6">
                                         <label for="{{ form.designation.id_for_label }}">{{ form.designation.label }}</label>
                                         {{ form.designation }}
                                         {{ form.designation.errors }}   
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="{{ form.categorie.id_for_label }}">{{ form.categorie.label }}</label>
                                         {{ form.categorie }}
                                         {{ form.categorie.errors }}   
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="{{ form.type_produit.id_for_label }}">{{ form.type_produit.label }}</label>
+                                        {{ form.type_produit }}
+                                        {{ form.type_produit.errors }}   
                                     </div>
                                 </div>
 

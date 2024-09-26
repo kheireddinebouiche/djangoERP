@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %} Détails du produit {% endblock title %}
 {% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% load static %}
 {% block content %}
 
 <div class="content-body">
@@ -20,7 +21,11 @@
                               <!-- Tab panes -->
                               <div class="tab-content" id="myTabContent">
                                   <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-                                    <img class="img-fluid  " src="{{ obj.image.url }}" alt="">
+                                    {% if not obj.image %}
+                                      <img class="img-fluid" src="{% static 'back/images/no_prod.webp' %}" alt="">
+                                    {% else %}
+                                      <img class="img-fluid" src="{{ obj.image.url }}" alt="">
+                                    {% endif %}
                                   </div>
                               </div>
                           </div>
@@ -54,91 +59,13 @@
                       </div>
                   </div>
                   <div class="card-footer">
-                    <button type="button" id="updateBtn" data-id="{{obj.id}}" data-bs-toggle="modal" data-bs-target="#detailsDuProduit" class="btn btn-warning" >Modifier les informations</button>
+                  
+                    <a href="{% url 'commercial:update_produit' pk=obj.id %}"  class="btn btn-warning" >Modifier les informations</a>
                   </div>
               </div>
           </div>
       </div>
   </div>
 </div>
-
-<!-- The Modal -->
-<div class="modal fade" id="detailsDuProduit" tabindex="-1" aria-labelledby="detailsDuProduitLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-          <!-- Modal Header -->
-          <div class="modal-header">
-              <h5 class="modal-title" id="detailsDuProduitLabel">Modification des informations du produit</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-
-          <!-- Modal Body -->
-          <div class="modal-body">
-              <form method="POST">
-                  
-                  <div class="row">
-                      <div class="col-lg-6">
-                          <label for="new_label_product"><b>Désignation du produit</b></label>
-                          <input type="text" id="new_label_product" name="new_label_product" class="form-control" >
-                      </div>
-                      <div class="col-lg-6">
-                          <label for="new_email"><b>Email</b></label>
-                          <select id="category_select" class="form-control" name="category">
-                           
-                        </select>
-                      </div>
-                  </div>        
-                  
-              </form>
-          </div>
-
-          <!-- Modal Footer -->
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-              <button type="submit" class="btn btn-warning" id="updateProductInfos">Modifier les informations</button>
-          </div>
-      </div>
-  </div>
-</div>
-
-<script>
-  $(document).ready(function(){
-
-    $(document).on('click', '#updateBtn', function(){
-      var id_product = $(this).data('id');
-      $.ajax({
-        url : "{% url 'commercial:ApiFetchProductDetails' %}",
-        data : {
-          'id_product' : id_product,
-        },
-        type: 'GET',
-        success : function(data){
-          var i = data.product;
-          var c = data.categories;
-
-          $('#new_label_product').val(i.designation);
-
-           // Vider le champ select avant de le remplir
-          var $categorySelect = $('#category_select');
-              $categorySelect.empty();
-
-              // Remplir le champ select avec les catégories disponibles
-              $.each(c, function(index, category) {
-                  var selected = i.categorie === category.id ? 'selected' : '';
-                  $categorySelect.append('<option value="' + category.id + '" ' + selected + '>' + category.label + '</option>');
-              });
-        },
-      });
-    }); 
-    
-    $(document).on('click', '#updateProductInfos', function(){
-      var new_designation = document.getElementById('new_label_product').value;
-
-     
-     
-    });
-    
-  });
-</script>
 
 {% endblock content %}

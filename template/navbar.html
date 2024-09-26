@@ -34,35 +34,7 @@
                     <span class="nav-text">Tableau de bord</span>
                 </a>
             </li>
-
-             <!-- Gestion CRM -->
-                <!-- <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
-                    <i class="flaticon-025-dashboard"></i>
-                    <span class="nav-text">CRM</span>
-                </a>
-                    <ul aria-expanded="false">
-                        <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Prospects</a>
-                            <ul aria-expanded="false">
-                                <li><a href="{% url 'commercial:list_prospect' %}">Liste des prospects</a></li>
-                                <li><a href="{% url 'commercial:nouveau_prospect' %}">Nouveau prospect</a></li>
-                            </ul>
-                        </li>
-
-                        <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Opportunité</a>
-                            <ul aria-expanded="false">
-                                <li><a href="{% url 'commercial:liste_opportunite' %}">Liste des opportunités</a></li>
-                                <li><a href="{% url 'commercial:add_opportunite' %}">Nouvelle opportunité</a></li>
-                            </ul>
-                        </li>
-                        <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Rappels</a>
-                            <ul aria-expanded="false">
-                                <li><a href="{% url 'commercial:liste_rappele' %}">Liste des rappels</a></li>
-                            </ul>
-                        </li>
-
-                    </ul>
-                </li> -->
-            <!-- Gestion CRM -->
+ 
 
             <!-- Gestion des Clients & Fournissuer -->
             <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
@@ -151,6 +123,12 @@
                         <li><a href="{% url 'commercial:add_facture' %}">Nouvelle facture</a></li>
                         <li><a href="{% url 'commercial:page_liste_facture' %}">Liste des factures</a></li>
                         <li><a href="{% url 'commercial:FactureAvoirePage' %}">Factures d'avoire</a></li>
+                        <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Bons de livraison</a>
+                            <ul aria-expanded="false">
+                                <li><a href="#">Nouveau</a></li>
+                                <li><a href="#">Liste des livraisons</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>
                 <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Paiements</a>
@@ -160,20 +138,9 @@
                     </ul>
                 </li>
                 <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Commandes</a>
-                    <ul aria-expanded="false">
-                        
-                        <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Bons de commandes</a>
-                            <ul aria-expanded="false">
-                                <li><a href="{% url 'commercial:CreateBonCommande' %}">Nouveau</a></li>
-                                <li><a href="{% url 'commercial:PageListeCommande' %}">Liste des commandes</a></li>
-                            </ul>
-                        </li>
-                        <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Bons de livraison</a>
-                            <ul aria-expanded="false">
-                                <li><a href="#">Nouveau</a></li>
-                                <li><a href="#">Liste des livraisons</a></li>
-                            </ul>
-                        </li>
+                    <ul aria-expanded="false">               
+                        <li><a href="{% url 'commercial:CreateBonCommande' %}">Nouveau</a></li>
+                        <li><a href="{% url 'commercial:PageListeCommande' %}">Liste des commandes</a></li>
                     </ul>
                 </li>
                 

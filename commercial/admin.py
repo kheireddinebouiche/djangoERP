@@ -49,7 +49,7 @@ class LigneFactureClass(admin.ModelAdmin):
 
 @admin.register(Bons_livraison)
 class BonsLivraisonClass(admin.ModelAdmin):
-    list_display = ('id', 'number', 'fournisseur' ,'montant_total', 'montant_paye', 'montant_restant')
+    list_display = ('id', 'number', 'client' )
 
 @admin.register(Lignes_bon_livraison)
 class LignesBonLivraisonClass(admin.ModelAdmin):

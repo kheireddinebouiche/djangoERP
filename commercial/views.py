@@ -1707,7 +1707,7 @@ def product_liste(request):
     except ObjectDoesNotExist:
         config = None
 
-    list = Products.objects.all()
+    list = Products.objects.filter(type_produit='pro')
 
     context = {
         'list' : list,
@@ -1862,8 +1862,9 @@ def ApiUpdateService(request):
         udapte_description = request.POST.get('udapte_description')
         service_id = request.POST.get('service_id')
         
+        print(service_id)
 
-        obj = Products.objects.get(id = service_id)
+        obj = Products.objects.get(id = int(service_id))
         categorie = Categorie_produit.objects.get(id = update_categorie)
 
         obj.designation = new_update_service_name

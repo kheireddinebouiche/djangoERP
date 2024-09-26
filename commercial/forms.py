@@ -110,7 +110,7 @@ class ProductAddForm(forms.ModelForm):
         fields = ['type_produit','designation','ref','categorie','code_barre','prix_vente','prix_achat','cout_produit','image','stock_alert']
         labels = {
             'designation' : "Désignation du produit :",
-            'categorie' : "Veuillez séléctionner la catégorie du produit/Article :",
+            'categorie' : "Catégorie du produit/Article :",
             'code_barre' : "Code à barre :",
             'prix_vente' : "Prix de vente :",
             'prix_achat' : "Prix d'achat :",
@@ -272,5 +272,5 @@ class CreatedBonCommande(forms.ModelForm):
 class CreateBonLivraisonForm(forms.ModelForm):
     class Meta:
         model = Bons_livraison
-        fields = ['fournisseur','date_du_bon','lieu_livraison','observation',]
+        fields = ['client','date_du_bon','lieu_livraison','observation',]
         pass
