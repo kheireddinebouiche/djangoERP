@@ -76,7 +76,7 @@
                                         <button data-id="{{obj.id}}" type="button" id="updateFactureBtn" class="btn btn-success"> Modifier </button>
                                     {% endif %}
                                     {% if obj.etat == "val" %}
-                                        <a href="{% url 'commercial:makeDevisBrouillon' pk=obj.id %}" class="btn btn-primary"> Brouillon </a>
+                                        <a href="{% url 'commercial:makeFactureBrouillon' pk=obj.id %}" class="btn btn-primary"> Brouillon </a>
 
                                         {% if obj.is_delivred == "0" %}
                                             <a href="{% url 'commercial:makeDevisBrouillon' pk=obj.id %}" class="btn btn-warning"> Livrer </a>
@@ -462,6 +462,7 @@
             
         });
         
+
     });
 </script>
 

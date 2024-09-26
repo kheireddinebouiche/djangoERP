@@ -50,6 +50,7 @@ urlpatterns = [
     path('addNewFactureProduct', addNewFactureProduct ,name="addNewFactureProduct"),
     path('deleteLigneFacture', deleteLigneFacture, name="deleteLigneFacture"),
     path('deleteFacture', deleteFacture, name="deleteFacture"),
+    path('makeFactureBrouillon/<int:pk>/', makeFactureBrouillon, name="makeFactureBrouillon"),
 
     path('ventes/facture-avoir/', FactureAvoirePage ,name="FactureAvoirePage"),
     path('APIGetFactureAvoir', APIGetFactureAvoir, name="APIGetFactureAvoir"),

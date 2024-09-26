@@ -486,7 +486,6 @@ def addNewDevisProduct(request):
 @login_required(login_url='/login/')
 def addNewFactureProduct(request):
     if request.method == "POST":
-
         id_facture = request.POST.get('id_facture')
         produit = request.POST.get('produit')
         qty = request.POST.get('qty')
@@ -496,45 +495,21 @@ def addNewFactureProduct(request):
         fac = Facture.objects.get(id = id_facture)
         tva = Tva.objects.get(id=taux)
         taux_appliquer = (int(tva.taux)/100)
-        stock = Stock.objects.get(product = pr)
 
+        try:
+            stock = Stock.objects.get(product = pr)
+        except ObjectDoesNotExist:
+            stock = None
 
-        if(int(stock.qty) > 0):
-        
+        if(stock != None ):        
             if(fac.devis == None):
-
-                new_ligne = Ligne_Facture(
-                    produit = pr,
-                    facture = fac,
-                    qty = qty,
-                    tva = tva.taux,
-                    ht = pr.prix_vente * int(qty),
-                    ttc = (float((pr.prix_vente * int(qty))) * (1+taux_appliquer)) 
-
-                )
+                new_ligne = Ligne_Facture(produit=pr,facture=fac,qty=qty,tva=tva.taux,ht=pr.prix_vente*int(qty),ttc=(float((pr.prix_vente*int(qty)))*(1+taux_appliquer)))
                 new_ligne.save()
-
             else:
-                new_ligne_facture = Ligne_Facture(
-                    produit = pr,
-                    facture = fac,
-                    qty = qty,
-                    tva = tva.taux,
-                    ht = pr.prix_vente * int(qty),
-                    ttc = (float((pr.prix_vente * int(qty))) * (1+taux_appliquer)) 
-
-                )
+                new_ligne_facture = Ligne_Facture(produit=pr,facture=fac,qty=qty,tva=tva.taux,ht=pr.prix_vente*int(qty),ttc=(float((pr.prix_vente*int(qty)))*(1+taux_appliquer)))
                 new_ligne_facture.save()
 
-                new_ligne_devis = Ligne_Devis(
-                    produit = pr,
-                    devis = fac.devis,
-                    qty = qty,
-                    tva = tva.taux,
-                    ht = pr.prix_vente * int(qty),
-                    ttc = (float((pr.prix_vente * int(qty))) * (1+taux_appliquer)) 
-
-                )
+                new_ligne_devis = Ligne_Devis(produit=pr,devis=fac.devis,qty=qty,tva=tva.taux,ht=pr.prix_vente*int(qty),ttc=(float((pr.prix_vente*int(qty)))*(1+taux_appliquer)) )
                 new_ligne_devis.save()
             
             montant_ht = Ligne_Facture.objects.filter(facture__id=fac.id).aggregate(total=Sum('ht'))['total']
@@ -544,24 +519,14 @@ def addNewFactureProduct(request):
             messages.success(request, "Produit ajouté avec succès")
             response_messages = []
             for message in messages.get_messages(request):
-                response_messages.append({
-                    "message": message.message,
-                    "tags": message.tags,
-                })
-
+                response_messages.append({"message": message.message,"tags": message.tags,})
             return JsonResponse({'messages': response_messages,'montant_ht': montant_ht,'montant_ttc':montant_ttc,'montant_tva':montant_tva})
 
         else:
-            
             messages.error(request, "Le produit n'est pas disponible dans le stock")
-
             response_messages = []
             for message in messages.get_messages(request):
-                response_messages.append({
-                    "message": message.message,
-                    "tags": message.tags,
-                })
-
+                response_messages.append({"message": message.message,"tags": message.tags,})
             return JsonResponse({'messages': response_messages})
 
 @login_required(login_url='/login/')
@@ -656,8 +621,17 @@ def GenFactureFromDevis(request, pk):
 
     return redirect('commercial:detailFacture', new_facture.id)
 
+@login_required(login_url='/login/')
 def updateFactureDetails(request,pk):
     pass
+
+@login_required(login_url='/login/')
+def makeFactureBrouillon(request,pk):
+    obj = Facture.objects.get(id = pk)
+    obj.etat = "bro"
+    obj.save()
+    messages.success(request, "La facture est en mode brouillon")
+    return redirect('commercial:config_facture', pk)
 
 @login_required(login_url='/login/')
 def detailFacture(request, pk):
