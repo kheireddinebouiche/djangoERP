@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %} Mon profile {% endblock title %}
-
+{% block sidebarre %} {% include 'navbar.html' %} {% endblock sidebarre %}
+{% load static %}
 {% block content %}
 <!--**********************************
 	Content body start
@@ -25,7 +26,12 @@
 						</div>
 						<div class="profile-info">
 							<div class="profile-photo">
-								<img src="images/profile/profile.png" class="img-fluid rounded-circle" alt="">
+								{% if not obj.image %}
+									<img src="{% static 'back/images/no_user.png' %}" class="img-fluid rounded-circle" alt="">
+								{% else %}
+									<img src="{{obj.image.url}}" class="img-fluid rounded-circle" alt="">
+								{% endif %}
+
 							</div>
 							<div class="profile-details">
 								<div class="profile-name px-3 pt-2">
