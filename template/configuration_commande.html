@@ -213,7 +213,7 @@
                 <option value="srv">Service</option>
               </select>
 
-              <label for="new_prix_achat">Prix de vente</label>
+              <label for="new_prix_achat">Prix d'achat</label>
               <input type="number" class="form-control" id="new_prix_achat" step="0.1">
 
             </div>
@@ -425,6 +425,8 @@
                             alertify.success(message.message);
                         } else if (message.tags.includes('error')) {
                             alertify.error(message.message);
+                        } else if (message.tags.includes('warning')){
+                            alertify.warning(message.message)
                         }
                     });
                     loadProducts();

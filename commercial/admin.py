@@ -6,7 +6,10 @@ admin.site.register(User)
 admin.site.register(Profile)
 
 admin.site.register(Contact)
-admin.site.register(Products)
+
+@admin.register(Products)
+class ProductsClass(admin.ModelAdmin):
+    list_display = ('id','designation','ref','created_at')
 
 @admin.register(Caisse)
 class CaisseAdmin(admin.ModelAdmin):

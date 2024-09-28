@@ -2515,25 +2515,23 @@ def ApiConfirmAddNewProduct(request):
         new_ref_add = request.POST.get('new_ref_add')
         new_type_produit = request.POST.get('new_type_produit')
         new_prix_achat = request.POST.get('new_prix_achat')
-
-        new_product = Products(
-            user = request.user,
-            designation = new_product_add,
-            ref = new_ref_add,
-            type_produit = new_type_produit,
-            prix_achat = new_prix_achat,
-        )
-
-        new_product.save()
-        messages.success(request,"Le nouveau produit à été ajouter avec succès !")
-        response_messages = []
-        for message in messages.get_messages(request):
-            response_messages.append({
-                "message": message.message,
-                "tags": message.tags,
-            })
-
-        return JsonResponse({'messages': response_messages})
+        try:
+            ref_prod = Products.objects.filter(ref = new_ref_add).count()
+            if(ref_prod == 1):
+                messages.warning(request,"Le produit existe déja dans la base de données")
+                response_messages = []
+                for message in messages.get_messages(request):
+                    response_messages.append({"message": message.message,"tags": message.tags,})
+                return JsonResponse({'messages': response_messages})
+            
+        except ObjectDoesNotExist:
+            new_product = Products( user = request.user,designation=new_product_add,ref=new_ref_add,type_produit=new_type_produit,prix_achat=new_prix_achat,prix_vente=0,)
+            new_product.save()
+            messages.success(request,"Le nouveau produit à été ajouter avec succès !")
+            response_messages = []
+            for message in messages.get_messages(request):
+                response_messages.append({"message": message.message,"tags": message.tags,})
+            return JsonResponse({'messages': response_messages})
 
 @login_required(login_url='/login/')
 def ApiFetchCommandeItem(request):
@@ -2693,11 +2691,7 @@ def ApiValidateBonCommande(request):
         messages.success(request, 'Le bon de commande à été valider avec succès')
         response_messages = []
         for message in messages.get_messages(request):
-            response_messages.append({
-                "message": message.message,
-                "tags": message.tags,
-            })
-
+            response_messages.append({"message": message.message, "tags": message.tags,})
         return JsonResponse({'messages': response_messages})
 
 @login_required(login_url='/login/')
