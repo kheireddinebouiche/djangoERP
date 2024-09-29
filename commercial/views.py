@@ -2681,6 +2681,7 @@ def ApiUpdateQty(request):
         return JsonResponse({'messages': response_messages})
 
 @login_required(login_url='/login/')
+@transaction.atomic
 def ApiValidateBonCommande(request):
     if request.method == "GET":
         id_commande = request.GET.get('id_commande')
@@ -2688,6 +2689,32 @@ def ApiValidateBonCommande(request):
 
         obj.etat = "val"
         obj.save()
+
+        ligne_commande = Lignes_BonCommande.objects.filter(ref_commande = obj)
+        for l in ligne_commande:
+
+            stock_item = Stock.objects.filter(product = l.produit).first()
+            new_mouvement = Mouvements_produit(
+                    user= request.user,
+                    produit = l.produit,
+                    qty = l.qty,
+                    type_mouvement = "ent",
+                    description = "Commande N° {obj}"
+            )
+            new_mouvement.save()
+
+            if stock_item:
+                stock_item.qty = int(stock_item.qty) + int(l.qty)
+                stock_item.save()             
+            else:
+                new_stock = Stock(
+                    user = request.user,
+                    product = l.produit,
+                    qty = l.qty,
+                )
+                new_stock.save()
+             
+        
         messages.success(request, 'Le bon de commande à été valider avec succès')
         response_messages = []
         for message in messages.get_messages(request):

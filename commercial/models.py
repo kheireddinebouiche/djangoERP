@@ -168,6 +168,7 @@ class Mouvements_produit(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     produit = models.ForeignKey(Products, on_delete=models.CASCADE, null=True, blank=True)
     description = models.CharField(max_length=1000, null=True, blank=True)
+    ref_commande = models.CharField(max_length=1000, null=True, blank=True)
     type_mouvement = models.CharField(max_length=3, null=True, blank=True, choices=TYPE_MOUV)
     qty = models.CharField(max_length=100, null=True, blank=True)
 

@@ -87,9 +87,9 @@
                                             '<span class="badge light badge-dark"><i class="fa fa-circle text-dark me-1"></i>'+p.etat_label+'</span>')+"</td>";
                             row += "<td>"+p.created_at+"</td>";
                             row += "<td>";
-                            row += "<a href='/achat/bons-de-commandes/configuration/"+p.id+"' class='btn btn-warning shadow btn-xs sharp me-1' id='editBTN'><i class='fas fa-pencil'></i></a>";
+                            row += "<a "+(p.etat == "val" ? "hidden" : " " )+" href='/achat/bons-de-commandes/configuration/"+p.id+"' class='btn btn-warning shadow btn-xs sharp me-1' id='editBTN'><i class='fas fa-pencil'></i></a>";
                             row += "<a href='#' class='btn btn-primary shadow btn-xs sharp me-1' id='detailsBtn'><i class='fas fa-eye'></i></a>";
-                            row += "<button data-id='"+p.id+"' id='confirmDeleteBtn' class='btn btn-danger shadow btn-xs sharp me-1'><i class='fa fa-trash'></i></button>";
+                            row += "<button "+(p.etat == "val" ? "hidden" : " " )+" data-id='"+p.id+"' id='confirmDeleteBtn' class='btn btn-danger shadow btn-xs sharp me-1'><i class='fa fa-trash'></i></button>";
                             row += "</td>";
                             row += "</tr>";
                         });
