@@ -54,7 +54,7 @@
                                             <td>
                                                 <div class="d-flex">
                                                     <a href="{% url 'commercial:update_produit' pk=e.id %}" class="btn btn-warning shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
-                                                    <a href="{% url 'commercial:details-produit' pk=e.id %}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-eye"></i></a>
+                                                    <button id="detailsBtn" data-id="{{e.id}}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-eye"></i></button>
                                                     
                                                     <a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
                                                 </div>												
@@ -120,5 +120,27 @@
         </div>
     </div>
 </div>
+
+<script>
+
+    $(document).ready(function(){
+
+        $(document).on('click','#detailsBtn', function(){
+            var id_stock = $(this).data('id');
+
+            $.ajax({
+                url : "{% url 'commercial:ApiGetMouvementOfStock %}",
+                type : 'GET',
+                data : {
+                    'id_stock' : id_stock,
+                },
+
+                success : function(data){
+
+                }
+            });
+        });
+    });
+</script>
 
 {% endblock content %}

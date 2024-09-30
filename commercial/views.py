@@ -2156,6 +2156,9 @@ def ApiDetailsMouvement(request):
             }
             return JsonResponse(data, safe=False)
 
+@login_required(login_url='/login/')
+def ApiGetMouvementOfStock(request):
+    pass
 ############## STOCK DES PRODUITS ##################################################
 
 ############## GESTION DES FOURNISSEURS ############################################

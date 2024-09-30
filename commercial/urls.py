@@ -140,7 +140,7 @@ urlpatterns = [
     path('ApiGetMouvItem', ApiGetMouvItem, name="ApiGetMouvItem"),
     path('DeleteMouvementLine', DeleteMouvementLine, name="DeleteMouvementLine"),
     path('ApiDetailsMouvement', ApiDetailsMouvement, name="ApiDetailsMouvement"),
-
+    path('ApiGetMouvementOfStock', ApiGetMouvementOfStock, name="ApiGetMouvementOfStock"),
     # Fin gestion du stock  ###############################################################################
 
     # Categorie des produits ##############################################################################
