@@ -47,6 +47,42 @@
     </div>
 </div>
 
+<!-- The Modal -->
+<div class="modal fade" id="commandeDetailsModal" tabindex="-1" aria-labelledby="commandeDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="commandeDetailsModalLabel">Détails du bon de commande</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body" id="bodyContent">
+                <input readonly hidden type="text" id="d_id_commande" class="form-control" />
+                <label for="d_num_commande">N° commande</label>
+                <input readonly type="text" id="d_num_commande" class="form-control" />
+
+                <div class="col-lg-12 mt-5">
+                    <h5>Détails des produits :</h5>
+                    <table class="table table-responsive">
+                        <thead>
+                            <th>Produit</th>
+                            <th>Qty</th>
+                        </thead>
+                        <tbody id="contentTable">
+        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="modal-footer" id="footer_update_user">
+               
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade zoomIn" id="deleteRecordModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -88,7 +124,7 @@
                             row += "<td>"+p.created_at+"</td>";
                             row += "<td>";
                             row += "<a "+(p.etat == "val" ? "hidden" : " " )+" href='/achat/bons-de-commandes/configuration/"+p.id+"' class='btn btn-warning shadow btn-xs sharp me-1' id='editBTN'><i class='fas fa-pencil'></i></a>";
-                            row += "<a href='#' class='btn btn-primary shadow btn-xs sharp me-1' id='detailsBtn'><i class='fas fa-eye'></i></a>";
+                            row += "<button data-id='"+p.id+"' class='btn btn-primary shadow btn-xs sharp me-1' id='detailsBtn'><i class='fas fa-eye'></i></button>";
                             row += "<button "+(p.etat == "val" ? "hidden" : " " )+" data-id='"+p.id+"' id='confirmDeleteBtn' class='btn btn-danger shadow btn-xs sharp me-1'><i class='fa fa-trash'></i></button>";
                             row += "</td>";
                             row += "</tr>";
@@ -134,7 +170,36 @@
                 },
             });
         });
-    
+        
+        $(document).on('click', '#detailsBtn', function(){
+            var id_commande = $(this).data('id');
+
+            $.ajax({
+                url : "{% url 'commercial:ApiFetchCommandeDetails' %}",
+                data : {
+                    'id_commande' : id_commande,
+                },
+                type : 'GET',
+                success : function(data){
+                    var obj = data.obj;
+                    var obj_item = data.obj_items;
+
+                    $('#d_id_commande').val(obj[0].id);
+                    $('#d_num_commande').val(obj[0].number);
+
+                    var row = " ";
+                    $.each(obj_item, function(index, p){
+                        row += "<tr>";
+                        row += "<td>"+p.produit__designation+"</td>";
+                        row += "<td>"+p.qty+"</td>";
+                        row += "</tr>";
+
+                    });
+                    $('#contentTable').html(row);
+                    $('#commandeDetailsModal').modal('show');
+                }
+            });
+        });
     });
 </script>
 

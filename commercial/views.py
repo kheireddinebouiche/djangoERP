@@ -2738,7 +2738,15 @@ def ApiMakeCommandeBrouillon(request):
 
         return JsonResponse({'messages': response_messages})
 
+@login_required(login_url='/login/')
+def ApiFetchCommandeDetails(request):
+    id_commande = request.GET.get('id_commande')
+    obj_fin = Bons_commande.objects.get(id= id_commande)
 
+    obj = Bons_commande.objects.filter(id = id_commande).values('id','date_du_bon','created_at','number')
+    obj_items = Lignes_BonCommande.objects.filter(ref_commande = obj_fin).values('id','produit__designation','qty')
+
+    return JsonResponse({'obj': list(obj), 'obj_items' : list(obj_items)}, safe=False)
 
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
