@@ -26,7 +26,7 @@
                     
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="example3" class="display" style="min-width: 100%">
+                            <table class="table table-responsive" style="min-width: 100%">
                                 <thead>
                                     <tr>
                                        
@@ -121,6 +121,36 @@
     </div>
 </div>
 
+<!-- The Modal -->
+<div class="modal fade" id="DetailsStockMouvement" tabindex="-1" aria-labelledby="DetailsStockMouvementLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="DetailsStockMouvementLabel">Détails des mouvements de produit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+
+                <table class="table table-responsive">
+                    <thead>
+                        <th>Date du mouvement</th>
+                        <th>Type</th>
+                        <th>Qty.</th>
+                    </thead>
+                    <tbody id="tableItemsBody">
+
+                    </tbody>
+                </table>
+               
+            </div> 
+        </div>
+    </div>
+</div>
+
+
 <script>
 
     $(document).ready(function(){
@@ -129,13 +159,23 @@
             var id_stock = $(this).data('id');
 
             $.ajax({
-                url : "{% url 'commercial:ApiGetMouvementOfStock %}",
+                url : "{% url 'commercial:ApiGetMouvementOfStock' %}",
                 type : 'GET',
                 data : {
                     'id_stock' : id_stock,
                 },
 
                 success : function(data){
+                    var row ="";
+                    $.each(data, function(index, p){
+                        row += "<tr>";
+                            row += "<td>"+p.created_at+"</td>";
+                            row += "<td><b>"+p.type_mouvement_label+"</b></td>";
+                            row += "<td><b>"+p.qty+"</b></td>";
+                        row += "</tr>";
+                    });
+                    $('#tableItemsBody').html(row);
+                    $('#DetailsStockMouvement').modal('show');
 
                 }
             });

@@ -2158,7 +2158,17 @@ def ApiDetailsMouvement(request):
 
 @login_required(login_url='/login/')
 def ApiGetMouvementOfStock(request):
-    pass
+    if request.method == "GET":
+        id_stock = request.GET.get('id_stock')
+        obj = Stock.objects.get(id = id_stock)
+
+        liste_items = Mouvements_produit.objects.filter(produit = obj.product).values('id','created_at','qty','type_mouvement')
+        for p in liste_items:
+            p_instance = Mouvements_produit.objects.get(id=p['id'])
+            p['type_mouvement_label'] = p_instance.get_type_mouvement_display()
+
+        return JsonResponse(list(liste_items), safe=False)
+
 ############## STOCK DES PRODUITS ##################################################
 
 ############## GESTION DES FOURNISSEURS ############################################
