@@ -124,12 +124,12 @@
                                 </thead>
                                 <tbody>
 
-                                    {% if items.count == 0 %}
-                                        {% for item in paiements %}
+                                    {% if paiements.count != 0 %}
+                                        {% for it in paiements %}
                                             <tr>
-                                                <td>{{item.ref_paiement}}</td>
-                                                <td><b>{{item.montant_paiement}} {{conf.devise}}</b></td>
-                                                <td>{{item.date_paiement}}</td>
+                                                <td>{{it.ref_paiement}}</td>
+                                                <td><b>{{it.montant_paiement}} {{conf.devise}}</b></td>
+                                                <td>{{it.date_paiement}}</td>
                                             
                                             </tr>
                                         {% endfor %}     

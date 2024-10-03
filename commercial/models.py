@@ -219,6 +219,7 @@ class RetourProduit(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     product = models.ForeignKey(Products, null=True, blank=True, on_delete=models.CASCADE)
     ref = models.CharField(max_length=100, null=True, blank=True)
+    qty = models.CharField(max_length=100, null=True, blank=True)
     observation = models.CharField(max_length=1000, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -460,6 +461,7 @@ class Facture(models.Model):
     etat = models.CharField(max_length=3, null=True, blank=True, choices=ETAT_DEVIS)
 
     is_delivred = models.CharField(max_length=1, null=True, blank=True, default=0)
+   
     ref_bon_livraison = models.ForeignKey(Bons_livraison,on_delete=models.SET_NULL, null=True, blank=True)
 
     montant_ht = models.DecimalField(decimal_places=2, null=True, blank=True, max_digits=100)
@@ -563,6 +565,8 @@ class LigneFactureAvoir(models.Model):
     tva = models.CharField(max_length=10, null=True, blank=True)
     ttc = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
+    rembourssement = models.DecimalField(max_digits=10, null=True, blank=True, decimal_places=2)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -641,7 +645,6 @@ class Lignes_BonCommande(models.Model):
             except ValueError:
                 self.total = 0  # Gestion d'erreur si la quantité n'est pas un nombre
         super().save(*args, **kwargs)
-
 
 class PaiementClient(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)

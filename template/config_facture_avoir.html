@@ -26,6 +26,7 @@
                                 <label for="id_facture_avoir">N° Facture d'avoir</label>
                                 <input hidden readonly ="text" class="form-control" id="number_facture" value="{{obj.number}}">
                                 <input hidden readonly ="text" class="form-control" id="id_facture_avoir" value="{{obj.id}}">
+                                <input hidden readonly ="text" class="form-control" id="id_facture_origin" value="{{obj.ref_facture}}">
                                 <p><b>{{conf.prefix_avoir}}-{{obj.number}}</b></p>
                             </div>
                             <div class="col-lg-4">
@@ -93,11 +94,7 @@
         <div class="row">     
             <div class="col-8">
                 <div class="card">
-                    <div class="card-header">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AjoutProduitAuDevis">
-                           + Produit
-                          </button>
-                    </div>
+                   
                     <div class="card-body">
                         <div class="table-responsive">
                             <table id="lignesCaisseTable" class="table table-responsive-md" style="min-width: 100%">
@@ -122,19 +119,24 @@
             <div class="col-4">
                 <div class="card">   
                     <div class="card-body">
+                        
+
                         <div class="row">
-                            <label for="montant_ht">Montant HT :</label>
-                            <input readonly  type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_ht" >
+                            <label for="montant_ttc">Montant remboursement :</label>
+                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;height: 30px; border: none;" class="form-control" id="montant_ttc">
                         </div>
 
                         <div class="row">
-                            <label for="montant_tva">Montant TVA :</label>
-                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_tva">
+                            <label for="deja_paye" style="color: red"><b>Montant payé</b></label>
+                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;height: 30px; border: none; color:red;" class="form-control" id="deja_paye">
                         </div>
-
                         <div class="row">
-                            <label for="montant_ttc">Montant TTC :</label>
-                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;" class="form-control" id="montant_ttc">
+                            <label for="montant_facture" style="color: red"><b>Montant facture</b></label>
+                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;height: 30px; border: none; color:red;" class="form-control" id="montant_facture">
+                        </div>
+                        <div class="row">
+                            <label for="rest_paye" style="color: red"><b>Reste a paye</b></label>
+                            <input readonly type="text" style="text-align: right;font-size: 18px;font-weight: 800;height: 30px; border: none; color:red;" class="form-control" id="rest_paye">
                         </div>
 
                     </div>
@@ -323,18 +325,13 @@
     $(document).ready(function(){
 
         var id_facture_avoir = document.getElementById('id_facture_avoir').value;
-        var montant_facture = document.getElementById('montant_ht').value;
+        var montant_facture = document.getElementById('montant_ttc').value;
 
-
-        $('#montant_ht').val('{{montant_ht|floatformat:2}}'+' '+'{{conf.devise}}');
-        $('#montant_ttc').val('{{montant_ttc|floatformat:2}}'+' '+'{{conf.devise}}');
-        $('#montant_tva').val('{{montant_tva|floatformat:2}}'+' '+'{{conf.devise}}');
+        $('#montant_ttc').val("-"+'{{montant_ttc|floatformat:2}}'+' '+'{{conf.devise}}');
+                    
        
-        loadFactureItem()
-
-        if (montant_facture  == 0){
-            $('#validateBtn').prop('disabled', true);
-        }
+        loadFactureItem();
+        getPaiements();
 
         $(document).on('click', '#addNewProduct', function(){
             var produit = document.getElementById('product').value;
@@ -362,16 +359,33 @@
                     });
                     
                     loadFactureItem();
-                    $('#montant_ht').val(parseFloat(response.montant_ht).toFixed(2)+' '+'{{conf.devise}}');
                     $('#montant_ttc').val(parseFloat(response.montant_ttc).toFixed(2)+' '+'{{conf.devise}}');
-                    $('#montant_tva').val(parseFloat(response.montant_tva).toFixed(2)+' '+'{{conf.devise}}');
+                 
                     $('#AjoutProduitAuDevis').modal('hide');
-                    $('#validateBtn').prop('disabled', false);
+                    
                 }
             });
         });
 
+        function getPaiements(){
+            var ref_facture_origin = document.getElementById('id_facture_origin').value;
+
+            $.ajax({
+                url : "{% url 'commercial:ApiGetPaiements' %}",
+                type : 'GET',
+                data : {
+                    'ref_facture_origin' : ref_facture_origin,
+                },
+                success : function(response){
+                    $('#deja_paye').val(parseFloat(response.total_paiement).toFixed(2)+" {{conf.devise}}");
+                    $('#rest_paye').val(parseFloat(response.reste).toFixed(2)+" {{conf.devise}}");
+                    $('#montant_facture').val(parseFloat(response.facture_amount).toFixed(2)+" {{conf.devise}}");
+                },
+            });
+        }
+
         function loadFactureItem(){
+            
             $.ajax({
                 url : "{% url 'commercial:ApiFetchFactureAvoirItem' %}",
                 type : "GET",
@@ -430,6 +444,7 @@
             var qty_retour = document.getElementById('qty_retour').value;
             var motif_retour = document.getElementById('motif_retour').value;
             var if_reintegre = document.getElementById('if_reintegre').value;
+            var id_facture_avoir = document.getElementById('id_facture_avoir').value;
 
             $.ajax({
                 url : "{% url 'commercial:ApiUpdateLigneFactureAvoir' %}",
@@ -439,6 +454,7 @@
                     'qty_retour' : qty_retour,
                     'motif_retour' : motif_retour,
                     'if_reintegre' : if_reintegre,
+                    'id_facture_avoir' : id_facture_avoir,
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(response){
@@ -478,14 +494,9 @@
                     });
                     
                     loadFactureItem();
-                    $('#montant_ht').val(parseFloat(response.montant_ht).toFixed(2)+' '+'{{conf.devise}}');
+           
                     $('#montant_ttc').val(parseFloat(response.montant_ttc).toFixed(2)+' '+'{{conf.devise}}');
-                    $('#montant_tva').val(parseFloat(response.montant_tva).toFixed(2)+' '+'{{conf.devise}}');
-                    
-                    if (montant_facture  == 0){
-                        $('#validateBtn').prop('disabled', true);
-                    }
-                                
+                  
 
                 }
             });

@@ -60,6 +60,7 @@ urlpatterns = [
     path('ApiFetchFactureAvoirItem', ApiFetchFactureAvoirItem, name="ApiFetchFactureAvoirItem"),
     path('ApiFetchLigneAvoirDetails', ApiFetchLigneAvoirDetails, name="ApiFetchLigneAvoirDetails"),
     path('ApiUpdateLigneFactureAvoir', ApiUpdateLigneFactureAvoir, name="ApiUpdateLigneFactureAvoir"),
+    path('ApiGetPaiements', ApiGetPaiements, name="ApiGetPaiements"),
 
     # GESTION DES DEVIS ###################################################################################
 

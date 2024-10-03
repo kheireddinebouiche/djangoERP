@@ -80,9 +80,9 @@
                     $.each(data, function(index, p){
 
                         row += "<tr>";
-                        row += "<td>"+p.product__designation+"</td>";
+                        row += "<td><b>"+p.product__designation+"</b></td>";
                         row += "<td>"+p.product__ref+"</td>";
-                        row += "<td>A</td>";
+                        row += "<td><b>"+p.qty+"</b></td>";
                         row += "<td>"+p.created_at+"</td>";
                         row += "<td>";
                         row += "<button data-id='"+p.id+"' class='btn btn-primary shadow btn-xs sharp me-1' id='profileDetails'><i class='fas fa-pencil-alt'></i></button>";

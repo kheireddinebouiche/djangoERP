@@ -216,13 +216,14 @@ def AddPaiement(request):
         facture  =Facture.objects.get(id = id_facture)
 
         montant_ttc = Ligne_Facture.objects.filter(facture = facture).aggregate(total=Sum('ttc'))['total']
+
         montant_paye = PaiementClient.objects.filter(facture = facture).aggregate(total=Sum('montant_paiement'))['total']
+        
+        montant_paye = montant_paye if montant_paye is not None else 0
 
-        montant_res = montant_ttc - montant_paye
+        montant_res = float(montant_ttc) - float(montant_paye)
      
-
         if float(montant_res) > float(montant_paiement):
-
             new_paiement = PaiementClient(
                 user = request.user,
                 facture = facture,
@@ -231,21 +232,12 @@ def AddPaiement(request):
                 ref_paiement = ref_paiement
             )
             new_paiement.save()
-
-            messages.success(request,"Le paiement a été ajouter avec succès")
-        
+            messages.success(request,"Le paiement a été ajouter avec succès")      
         else:
-
             messages.error(request,"Le montant payé est supperieur au montant restant à payé")
-
-        # Extraire les messages
         response_messages = []
         for message in messages.get_messages(request):
-            response_messages.append({
-                "message": message.message,
-                "tags": message.tags,
-            })
-
+            response_messages.append({"message": message.message,"tags": message.tags,})
         return JsonResponse({'messages': response_messages})
 
 
@@ -258,10 +250,8 @@ def ListRetourProduit(request):
 
 @login_required(login_url='/login/')
 def ApiGetRetourProduitItem(request):
-    liste = RetourProduit.objects.all().values('id','product__designation','product__ref','ref','observation','created_at')
+    liste = RetourProduit.objects.all().values('id','product__designation','product__ref','ref','observation','created_at','qty')
     for fac in liste:
-        fac_instance = RetourProduit.objects.get(id=fac['id'])
-       
         fac['created_at'] = fac['created_at'].strftime('%Y-%m-%d')
 
     return JsonResponse(list(liste), safe=False)
@@ -642,7 +632,6 @@ def detailFacture(request, pk):
     items = Ligne_Facture.objects.filter(facture = obj)
     paiements = PaiementClient.objects.filter(facture = obj)
     
-
     montant_ht = Ligne_Facture.objects.filter(facture=obj).aggregate(total=Sum('ht'))['total']
     montant_ttc = Ligne_Facture.objects.filter(facture=obj).aggregate(total=Sum('ttc'))['total']
     montant_tva = montant_ttc-montant_ht
@@ -943,16 +932,19 @@ def AvoirConf(request, pk):
     conf = GeneralSettings.objects.get()
     products = Products.objects.all()
     tva = Tva.objects.all()
+    
 
     try:
         montant_ht = LigneFactureAvoir.objects.filter(ref_facture_avoir__id=obj.id).aggregate(total=Sum('ht'))['total']
         montant_ttc = LigneFactureAvoir.objects.filter(ref_facture_avoir__id=obj.id).aggregate(total=Sum('ttc'))['total']
         montant_tva = montant_ttc-montant_ht
+
     except:
 
         montant_tva = 0
         montant_ttc = 0
         montant_ht  = 0
+
 
     context = {
         'obj' : obj,
@@ -964,6 +956,26 @@ def AvoirConf(request, pk):
         'montant_ht': montant_ht,
     }
     return render(request,'config_facture_avoir.html', context)
+
+@login_required(login_url='/login/')
+def ApiGetPaiements(request):
+    if request.method == 'GET':
+        ref_facture_origin = request.GET.get('ref_facture_origin')
+        fac = Facture.objects.get(number = ref_facture_origin)
+
+        facture_amount = Ligne_Facture.objects.filter(facture = fac).aggregate(total=Sum('ttc'))['total']
+        
+        facture_avoir = Facture_Avoir.objects.get(ref_facture = fac)
+
+        amount_facture_avoir = LigneFactureAvoir.objects.filter(ref_facture_avoir = facture_avoir).aggregate(total=Sum('ttc'))['total']
+
+        obj = PaiementClient.objects.filter(facture = fac).aggregate(total=Sum('montant_paiement'))['total'] 
+
+        total_paiement = obj if obj is not None else 0
+
+        reste = float(facture_amount) - float(total_paiement) - float(amount_facture_avoir)
+
+        return JsonResponse({'status': 'success', 'facture_amount': facture_amount, 'total_paiement': total_paiement,'reste' : reste, 'amount_facture_avoir' : amount_facture_avoir })
 
 @login_required(login_url='/login/')
 def ApiFetchFactureAvoirItem(request):
@@ -994,13 +1006,14 @@ def ApiUpdateLigneFactureAvoir(request):
         qty_retour = request.POST.get('qty_retour')
         motif_retour = request.POST.get('motif_retour')
         if_reintegre = request.POST.get('if_reintegre')
+        id_facture_avoir = request.POST.get('id_facture_avoir')
 
         avoir = LigneFactureAvoir.objects.get(id = lign_facture_avoir)
         taux_appliquer = (int(avoir.tva)/100)
         
         if if_reintegre == "non":
 
-            avoir.qty = int(avoir.qty) - int(qty_retour)
+            avoir.qty = int(qty_retour)
             avoir.save()
 
             avoir.ht = int(avoir.qty) * avoir.produit.prix_vente
@@ -1008,31 +1021,17 @@ def ApiUpdateLigneFactureAvoir(request):
 
             avoir.save()
 
-            new_mouvement = Mouvements_produit(
-                user = request.user,
-                produit = avoir.produit,
-                type_mouvement = "ent",
-                qty = qty_retour,
-                description = motif_retour,
-            )
+            new_mouvement = Mouvements_produit(user = request.user,produit = avoir.produit,type_mouvement = "ent",qty = qty_retour,description = motif_retour,)
             new_mouvement.save()
 
-            new_retour_produit = RetourProduit(
-                user = request.user,
-                product = avoir.produit,
-                ref = lign_facture_avoir,
-                observation = motif_retour,
-            )
+            new_retour_produit = RetourProduit(user = request.user,product = avoir.produit,ref = id_facture_avoir,observation = motif_retour,qty = avoir.qty,)
             new_retour_produit.save()
 
             messages.success(request, "L'opération à été effectuer avec succès")
 
             response_messages = []
             for message in messages.get_messages(request):
-                response_messages.append({
-                "message": message.message,
-                "tags": message.tags,
-            })
+                response_messages.append({"message": message.message,"tags": message.tags,})
                 
             return JsonResponse({'messages': response_messages})
         
