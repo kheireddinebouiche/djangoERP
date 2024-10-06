@@ -2762,6 +2762,12 @@ def ApiFetchCommandeDetails(request):
 
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
+def ApiCheckForAvoir(request):
+    if request.method == 'GET':
+        id_facture = request.GET.get('id_facture')
+        obj = Facture.objects.get(number = id_facture)
+        avoir = Facture_Avoir.objects.filter(ref_facture = obj).values('id','number','created_at')
 
+        return JsonResponse(list(avoir), safe=False)
 
 

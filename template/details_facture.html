@@ -20,6 +20,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row" style="margin-bottom:50px;">
+                            <input type="text" hidden readonly value="{{obj.number}}" id="id_facture" />
                             <h3><b>{{conf.prefix_facture}} - {{obj.number}}</b></h3>
                             {% if obj.devis %}
                                 <p><b>Réf. commande :</b> {{conf.prefix_devis}}-{{obj.devis}}</p>
@@ -101,8 +102,8 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="row" style="color:red;">
-                            Une facture d'avoir à été generer sous le N° ......... 
+                        <div id="row_avoir" class="row" style="color:red;">
+                            <p>Une facture d'avoir à été generer sous le N° <span type="text" id="avoir_number"> </span></p>
                         </div>
                     </div>
                 </div>
@@ -148,4 +149,31 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function(){
+        
+        checkAvoir();
+
+        function checkAvoir(){
+            var id_facture = document.getElementById('id_facture').value;
+            $.ajax({
+                url : "{% url 'commercial:ApiCheckForAvoir' %}",
+                type : 'GET',
+                data : {
+                    'id_facture' : id_facture,
+                },
+                success : function(data){
+                    var p = data[0];
+                    if (data.length > 0){
+                        $('#avoir_number').text(p.number);
+                    }else{
+                        $('#row_avoir').hide(true);
+                    }
+                }
+            });
+        };  
+    }); 
+
+</script>
 {% endblock content %}
