@@ -62,8 +62,8 @@
                     <span class="nav-text">Clients</span>
                 </a>
                     <ul aria-expanded="false">
-                        <li><a href="{% url 'commercial:client-list' %}">Liste des clients</a></li>
-                        <li><a href="{% url 'commercial:add-client' %}">Ajouter un client</a></li>
+                        <li><a href="{% url 'commercial:client-list' %}">Liste</a></li>
+                        <li><a href="{% url 'commercial:add-client' %}">Nouveau</a></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
@@ -71,8 +71,8 @@
                     <span class="nav-text">Fournisseurs</span>
                 </a>
                     <ul aria-expanded="false">
-                        <li><a href="{% url 'commercial:liste_fournisseur' %}">Liste des fournissseurs</a></li>                       
-                        <li><a href="{% url 'commercial:nouveau_fournisseur' %}">Ajouter un fournisseur</a></li>
+                        <li><a href="{% url 'commercial:liste_fournisseur' %}">Liste</a></li>                       
+                        <li><a href="{% url 'commercial:nouveau_fournisseur' %}">Nouveau</a></li>
                     </ul>
                 </li>
             <!-- Gestion des Clients & Fournissuer -->
@@ -142,7 +142,7 @@
                 <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Paiements</a>
                     <ul aria-expanded="false">
                         <li><a href="{% url 'commercial:listePaiement' %}">Paiements clients</a></li>
-                        <li><a href="#">Paiements fournisseurs</a></li>
+                        <li><a href="{% url 'commercial:listePaiementFournisseur' %}">Paiements fournisseurs</a></li>
                     </ul>
                 </li>
                 <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Commandes</a>

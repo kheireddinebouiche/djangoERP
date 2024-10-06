@@ -646,6 +646,22 @@ class Lignes_BonCommande(models.Model):
                 self.total = 0  # Gestion d'erreur si la quantité n'est pas un nombre
         super().save(*args, **kwargs)
 
+class PaiementsFournisseurs(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    ref_bon_commande = models.ForeignKey(Bons_commande, on_delete=models.CASCADE, null=True, blank=True)
+    montant = models.DecimalField(max_digits=100, null=True, blank=True, decimal_places=2)
+    ref_paiement = models.CharField(max_length=1000, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name="Paiement du fournisseur"
+        verbose_name_plural = "Paiements des fournisseurs"
+
+    def __str__(self):
+        return self.ref_bon_commande
+
 class PaiementClient(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     facture = models.ForeignKey(Facture, on_delete=models.CASCADE, null=True, blank=True)

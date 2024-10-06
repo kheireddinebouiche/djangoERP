@@ -75,3 +75,7 @@ class BonCommandeClass(admin.ModelAdmin):
 @admin.register(Bons_commande)
 class BonCommandeClass(admin.ModelAdmin):
     list_display = ('id','number','created_at','etat')
+
+@admin.register(PaiementsFournisseurs)
+class PaiementsFournisseurClass(admin.ModelAdmin):
+    list_display = ('id', 'ref_paiement','ref_bon_commande','montant','created_at')

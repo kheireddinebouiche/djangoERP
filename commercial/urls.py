@@ -188,6 +188,7 @@ urlpatterns = [
     path('ApiValidateBonCommande', ApiValidateBonCommande, name="ApiValidateBonCommande"),
     path('ApiMakeCommandeBrouillon', ApiMakeCommandeBrouillon, name="ApiMakeCommandeBrouillon"),
     path('ApiFetchCommandeDetails', ApiFetchCommandeDetails, name="ApiFetchCommandeDetails"),
+    path('paiements-founisseurs/',listePaiementFournisseur, name="listePaiementFournisseur"),
     ################### GESTION DES COMMANDES #############################################################
 
 ]

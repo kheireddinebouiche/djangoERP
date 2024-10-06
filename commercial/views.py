@@ -2762,6 +2762,7 @@ def ApiFetchCommandeDetails(request):
 
 ############# GESTION DES BONS DE COMMANDE ###################################################################
 
+@login_required(login_url='/login/')
 def ApiCheckForAvoir(request):
     if request.method == 'GET':
         id_facture = request.GET.get('id_facture')
@@ -2770,4 +2771,13 @@ def ApiCheckForAvoir(request):
 
         return JsonResponse(list(avoir), safe=False)
 
+##################################################### GESTION DES PAIEMENTD FOURNISSEURS #####################
+@login_required(login_url='/login/')
+def listePaiementFournisseur(request):
+    return render(request , 'liste_paiement_fournisseur.html')
 
+@login_required(login_url='/login/')
+def ApiGetListePaiementsFournisseurs(request):
+    pass
+
+##################################################### GESTION DES PAIEMENTD FOURNISSEURS #####################
