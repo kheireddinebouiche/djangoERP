@@ -170,7 +170,7 @@ urlpatterns = [
     path('ApiGetTauxDetails', ApiGetTauxDetails, name="ApiGetTauxDetails"),
     path('ApiUpdateTaux', ApiUpdateTaux, name="ApiUpdateTaux"),
 
-    ################### GESTION DES COMMANDES #############################################################
+    ################### GESTION DES COMMANDES #########################################################################
     path('achats/bons-de-commandes/',PageListeCommande, name="PageListeCommande"),
     path('ApiGetListeCommande',ApiGetListeCommande,name="ApiGetListeCommande"),
     path('achats/bons-de-commandes/nouvelle-commande/',CreateBonCommande, name="CreateBonCommande"),
@@ -189,6 +189,7 @@ urlpatterns = [
     path('ApiMakeCommandeBrouillon', ApiMakeCommandeBrouillon, name="ApiMakeCommandeBrouillon"),
     path('ApiFetchCommandeDetails', ApiFetchCommandeDetails, name="ApiFetchCommandeDetails"),
     path('paiements-founisseurs/',listePaiementFournisseur, name="listePaiementFournisseur"),
-    ################### GESTION DES COMMANDES #############################################################
+    path('ApiGetListePaiementsFournisseurs',ApiGetListePaiementsFournisseurs, name="ApiGetListePaiementsFournisseurs"),
+    ################### GESTION DES COMMANDES #########################################################################
 
 ]

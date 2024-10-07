@@ -2778,6 +2778,9 @@ def listePaiementFournisseur(request):
 
 @login_required(login_url='/login/')
 def ApiGetListePaiementsFournisseurs(request):
-    pass
+    if request.method == 'GET':
+        
+        liste = PaiementsFournisseurs.objects.all().values('id','ref_bon_commande','montant','created_at','ref_paiement')
 
+        return JsonResponse(list(liste), safe=False)
 ##################################################### GESTION DES PAIEMENTD FOURNISSEURS #####################
