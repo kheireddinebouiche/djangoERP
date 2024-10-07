@@ -158,6 +158,36 @@
         });
     };
 
+    $(document).on('click', '#addNewPaiement', function(){
+            var id_facture = document.getElementById('facture').value;
+            var date_paiement = document.getElementById('date_paiement').value;
+            var montant_paiement = document.getElementById('montant_paye').value;
+            var ref_paiement = document.getElementById('reference_paiement').value;
+
+            $.ajax({
+                url : '{% url "commercial:AddPaiementFournisseur" %}',
+                data : {
+                    'id_facture' : id_facture,
+                    'date_paiement' : date_paiement,
+                    'montant_paiement' : montant_paiement,
+                    'ref_paiement' : ref_paiement,
+                    
+                },
+                type : 'GET',
+                success: function(response){
+                    response.messages.forEach(function(message) {
+                        if (message.tags.includes('success')) {
+                            alertify.success(message.message);
+                        } else if (message.tags.includes('error')) {
+                            alertify.error(message.message);
+                        }
+                    });
+                    loadPaiementListe();
+                    $('#nouveauPaiement').modal('hide');
+                }
+                  
+            });
+        });
   });  
     
 </script>
