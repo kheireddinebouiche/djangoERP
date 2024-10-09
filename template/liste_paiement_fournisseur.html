@@ -208,7 +208,7 @@
     });
     
     $(document).on('click', '#deleteBtn', function(){
-            var id_commande = $(this).data('id');
+            var id_paiement = $(this).data('id');
 
             var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
 
@@ -216,12 +216,16 @@
                 "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion du paiement supprimera toutes les informations dans la base de données. </p>" +
                 "<div class = 'hstack gap-2 justify-content-center remove'>" +
                 "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
-                "<button class ='btn btn-primary' data-id='"+id_commande+"' id='confirmDelete'> Confirmer la suppréssion </button> </div>";
+                "<button class ='btn btn-primary' data-id='"+id_paiement+"' id='confirmDelete'> Confirmer la suppréssion </button> </div>";
 
             $('#deleteModalBody').html(lab+content);
             $('#deleteRecordModal').modal('show');
             
         })
+
+    $('#confirmDelete').on('click', '#confirmDelete', function(){
+        var id_paiement = $(this).get('id');
+    });
 });  
     
 </script>
