@@ -191,6 +191,7 @@ urlpatterns = [
     path('paiements-founisseurs/',listePaiementFournisseur, name="listePaiementFournisseur"),
     path('ApiGetListePaiementsFournisseurs',ApiGetListePaiementsFournisseurs, name="ApiGetListePaiementsFournisseurs"),
     path('AddPaiementFournisseur',AddPaiementFournisseur, name="AddPaiementFournisseur"),
+    path('ApiGetListeCommande',ApiGetListeCommande, name="ApiGetListeCommande"),
     ################### GESTION DES COMMANDES #########################################################################
 
 ]

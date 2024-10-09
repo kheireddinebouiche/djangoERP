@@ -230,11 +230,12 @@ class ProspectForm(forms.ModelForm):
 class ParamGenForm(forms.ModelForm):
     class Meta:
         model = GeneralSettings
-        fields = ['prefix_devis','prefix_facture','devise','logo','prefix_avoir']
+        fields = ['prefix_devis','prefix_facture','devise','logo','prefix_avoir','prefix_commande']
         labels = {
             'prefix_devis': "Préfixe des devis :",
             'prefix_facture': "Préfix des factures",
             'prefix_avoir' : "Préfix des factures d'avoir",
+            'prefix_commande' : "Préfixe des bons de commandes",
             'devise': "Devise :",
             'logo' : "Logo de l'entreprise",
             'print_ticket_pdf' : "Type de document point de vente :"
@@ -246,6 +247,7 @@ class ParamGenForm(forms.ModelForm):
             'devise' : forms.Select(attrs={'class':'form-control', 'id': 'devise'}),
             'logo' : forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'image'}),
             'print_ticket_pdf': forms.RadioSelect(attrs={'class' : 'form-control', 'id' : 'selec_impr'}),
+            'prefix_commande' : forms.TextInput(attrs={'class':'form-control', 'id': 'prefixCommande'}),
         }
 
 class CreatedBonCommande(forms.ModelForm):

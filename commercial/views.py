@@ -2774,18 +2774,47 @@ def ApiCheckForAvoir(request):
 ##################################################### GESTION DES PAIEMENTD FOURNISSEURS #####################
 @login_required(login_url='/login/')
 def listePaiementFournisseur(request):
+    
+    
     return render(request , 'liste_paiement_fournisseur.html')
 
 @login_required(login_url='/login/')
 def ApiGetListePaiementsFournisseurs(request):
     if request.method == 'GET':
 
-        liste = PaiementsFournisseurs.objects.all().values('id','ref_bon_commande','montant','created_at','ref_paiement')
+        liste = PaiementsFournisseurs.objects.all().values('id','ref_bon_commande__number','montant','created_at','ref_paiement')
 
         return JsonResponse(list(liste), safe=False)
 
 @login_required(login_url='/login/')
+@transaction.atomic
 def AddPaiementFournisseur(request):
     if request.method == 'GET':
-        pass
+        id_commande = request.GET.get('id_commande')
+        ref_paiement = request.GET.get('ref_paiement')
+        date_paiement = request.GET.get('date_paiement')
+        montant = request.GET.get('montant')
+
+        commande = Bons_commande.objects.get(id = id_commande)
+        new_paiement = PaiementsFournisseurs(
+            user = request.user,
+            ref_bon_commande = commande,
+            montant = montant,
+            date_paiement = date_paiement,
+            ref_paiement = ref_paiement,
+        )
+        new_paiement.save()
+        messages.success(request, "Le paiement à été enregistrer avec succès")
+        response_messages = []
+        for message in messages.get_messages(request):
+            response_messages.append({"message": message.message, "tags": message.tags,})
+        return JsonResponse({'messages': response_messages})
+
+
+@login_required(login_url='/login/')
+def ApiGetListeCommande(request):
+    if request.method == "GET":
+        liste = list(Bons_commande.objects.all().values('id', 'number'))
+        conf = GeneralSettings.objects.values('prefix_commande').first()  # Récupérer une seule instance de conf
+        return JsonResponse({'liste': liste, 'conf': conf}, safe=False)
 ##################################################### GESTION DES PAIEMENTD FOURNISSEURS #####################

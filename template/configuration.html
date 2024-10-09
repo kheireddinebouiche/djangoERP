@@ -24,8 +24,7 @@
                                 {% csrf_token %}
 
                                 <h4>Parametres général </h4>
-                                <div class="row  mt-3">
-                                    
+                                <div class="row  mt-3">       
                                     <div class="col-md-3">
                                         <label for="{{ form.prefix_devis.id_for_prefixdevis }}">{{ form.prefix_devis.label }}</label>
                                         {{ form.prefix_devis }}
@@ -41,6 +40,13 @@
                                     <div class="col-md-3">
                                         <label for="{{ form.prefix_avoir.id_for_prefix_avoir }}">{{ form.prefix_avoir.label }}</label>
                                         {{ form.prefix_avoir }}
+                                    </div>
+                                    
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.prefix_commande.id_for_prefix_commande }}">{{ form.prefix_commande.label }}</label>
+                                        {{ form.prefix_commande }}
                                     </div>
                                 </div>
                                

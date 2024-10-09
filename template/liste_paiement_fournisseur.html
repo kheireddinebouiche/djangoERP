@@ -81,12 +81,9 @@
 
                 <div class="row">
                     <div class="col-lg-12">
-                        <label for="facture">N° Facture</label>
-                        <select name="facutre" id="facture" class="form-control" required>
-                            <option value="none">------------------</option>
-                            {% for f in factures %}
-                                <option value="{{f.id}}">{{conf.prefix_facture}} {{f.number}}</option>
-                            {% endfor %}
+                        <label for="num_bon_commande">N° Bon de commande</label>
+                        <select name="num_bon_commande" id="num_bon_commande" class="form-control" required>
+                            
                         </select>
                     </div>
                 </div>
@@ -129,6 +126,7 @@
   $(document).ready(function(){
 
     loadItems();
+    loadBonsCommande();
 
     function loadItems(){
         $.ajax({
@@ -140,11 +138,13 @@
                     $.each(data, function(index, p){
                         
                             row += "<tr>";
-                            row += "<td>"+p.montant+"</td>";
-                            row += "<td>"+p.ref_bon_commande+"</td>";
+                            row += "<td><b>"+p.montant+"</b></td>";
+                            row += "<td><b>"+p.ref_bon_commande__number+"</b></td>";
                             row += "<td>"+p.montant+"</td>";
                             row += "<td>"+p.created_at+"</td>";
-                            row += "<td>A</td>";
+                            row += "<td>";
+                            row += "<button id='deleteBtn' data-id='"+p.id+"' class='btn btn-danger shadow btn-xs sharp'><i class='fa fa-trash'></i>"
+                            row +="</td>";
                             row += "</tr>";
                     
                         
@@ -158,37 +158,71 @@
         });
     };
 
-    $(document).on('click', '#addNewPaiement', function(){
-            var id_facture = document.getElementById('facture').value;
-            var date_paiement = document.getElementById('date_paiement').value;
-            var montant_paiement = document.getElementById('montant_paye').value;
-            var ref_paiement = document.getElementById('reference_paiement').value;
+    function loadBonsCommande(){
+        $.ajax({
+            url : "{% url 'commercial:ApiGetListeCommande' %}",
+            type : 'GET',
+            success : function(data){
+                var row = "";
+                var pListe = data.liste;
+                var c = data.conf;
 
-            $.ajax({
-                url : '{% url "commercial:AddPaiementFournisseur" %}',
-                data : {
-                    'id_facture' : id_facture,
-                    'date_paiement' : date_paiement,
-                    'montant_paiement' : montant_paiement,
-                    'ref_paiement' : ref_paiement,
-                    
-                },
-                type : 'GET',
-                success: function(response){
-                    response.messages.forEach(function(message) {
+                $.each(pListe, function(index, p){
+                    row += "<option value='" + p.id + "'>" + c.prefix_commande +" "+ p.number + "</option>";
+                });
+
+                $('#num_bon_commande').html(row)
+            },
+            
+        });
+    }
+    
+    $(document).on('click','#addNewPaiement',function(){
+        var id_commande = document.getElementById('num_bon_commande').value;
+        var date_paiement = document.getElementById('date_paiement').value;
+        var montant = document.getElementById('montant_paye').value;
+        var ref_paiement = document.getElementById('reference_paiement').value;
+
+        console.log(id_commande);
+        $.ajax({
+            url : "{% url 'commercial:AddPaiementFournisseur' %}",
+            type : 'GET',
+            data : {
+                'id_commande' : id_commande,
+                'date_paiement' : date_paiement,
+                'montant' : montant,
+                'ref_paiement' : ref_paiement,
+            },
+            success : function(response){
+                response.messages.forEach(function(message) {
                         if (message.tags.includes('success')) {
                             alertify.success(message.message);
                         } else if (message.tags.includes('error')) {
                             alertify.error(message.message);
                         }
                     });
-                    loadPaiementListe();
+                    loadItems();
                     $('#nouveauPaiement').modal('hide');
-                }
-                  
-            });
-        });
-  });  
+            }
+        })
+    });
+    
+    $(document).on('click', '#deleteBtn', function(){
+            var id_commande = $(this).data('id');
+
+            var lab = '<div class="swal2-icon swal2-warning swal2-animate-danger-icon" style="display: flex;"><span class="swal2-icon-text">!</span></div>';
+
+            var content = "<h4 class='fs-semibold'>Vous étes sur le point de supprimer le paiement</h4>" +
+                "<p class = 'text-muted fs-14 mb-4 pt-1' > La suppréssion du paiement supprimera toutes les informations dans la base de données. </p>" +
+                "<div class = 'hstack gap-2 justify-content-center remove'>" +
+                "<button class ='btn btn-link link-info fw-semibold text-decoration-none' id = 'deleteRecord-close' data-bs-dismiss = 'modal' > <i class = 'ri-close-line me-1 align-middle'> </i> Fermer </button>" +
+                "<button class ='btn btn-primary' data-id='"+id_commande+"' id='confirmDelete'> Confirmer la suppréssion </button> </div>";
+
+            $('#deleteModalBody').html(lab+content);
+            $('#deleteRecordModal').modal('show');
+            
+        })
+});  
     
 </script>
 

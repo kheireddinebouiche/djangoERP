@@ -651,6 +651,7 @@ class PaiementsFournisseurs(models.Model):
     ref_bon_commande = models.ForeignKey(Bons_commande, on_delete=models.CASCADE, null=True, blank=True)
     montant = models.DecimalField(max_digits=100, null=True, blank=True, decimal_places=2)
     ref_paiement = models.CharField(max_length=1000, null=True, blank=True)
+    date_paiement = models.DateField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -683,6 +684,7 @@ class GeneralSettings(models.Model):
     prefix_devis = models.CharField(max_length=1000, null=True, blank=True)
     prefix_facture = models.CharField(max_length=1000, null=True, blank=True)
     prefix_avoir = models.CharField(max_length=1000, null=True, blank=True)
+    prefix_commande = models.CharField(max_length=1000, null=True, blank=True)
     devise = models.CharField(max_length=3, null=True, blank=True, choices=DEVIS)
     logo = models.ImageField(upload_to="logo/", null=True, blank=True)
 
